@@ -12,50 +12,53 @@ export function getNodeNameByShortId(shortId: string, nodes: NodeInfo[]): string
   return idx >= 0 ? (NODE_NAMES[idx] ?? `Node ${idx}`) : shortId.slice(0, 8);
 }
 
-// --- Colors ---
+// --- Colors (aligned with assets/branding SVG palette) ---
 export const colors = {
-  surface0: '#0f0f23',
-  surface1: '#1a1a2e',
-  surface2: '#0d0d1a',
-  surface3: '#ffffff06',
+  surface0: '#0D1117',
+  surface1: '#161B22',
+  surface2: '#0D1117',
+  surface3: '#21262D14',
 
-  borderSubtle: 'rgba(255, 255, 255, 0.06)',
-  borderDefault: 'rgba(255, 255, 255, 0.08)',
-  borderStrong: 'rgba(255, 255, 255, 0.12)',
+  borderSubtle: 'rgba(48, 54, 61, 0.4)',
+  borderDefault: '#30363d',
+  borderStrong: 'rgba(48, 54, 61, 0.8)',
 
-  textPrimary: 'rgba(255, 255, 255, 0.87)',
-  textSecondary: '#cccccc',
-  textMuted: '#888888',
-  textDim: '#777777',
-  textFaint: '#555555',
+  textPrimary: '#E6EDF3',
+  textSecondary: '#c9d1d9',
+  textMuted: '#8b949e',
+  textDim: '#6e7681',
+  textFaint: '#484f58',
 
-  accentBlue: '#4a9eff',
-  accentGreen: '#2ecc71',
-  accentRed: '#e74c3c',
+  accentBlue: '#38BDF8',
+  accentGreen: '#4ECB71',
+  accentRed: '#f85149',
   accentOrange: '#e67e22',
-  accentYellow: '#f1c40f',
+  accentYellow: '#FACC15',
+  accentGold: '#FACC15',
+  accentPurple: '#8957E5',
+  accentTeal: '#4ECDC4',
 
-  online: '#2ecc71',
-  offline: '#e74c3c',
+  online: '#4ECB71',
+  offline: '#f85149',
 } as const;
 
 export const layerColors: Record<string, string> = {
-  bifrost: '#9b59b6',
-  yggdrasil: '#3498db',
-  veil: '#2ecc71',
-  saga: '#f1c40f',
+  bifrost: '#8957E5',
+  yggdrasil: '#58A6FF',
+  veil: '#4ECB71',
+  saga: '#FACC15',
   rune: '#e67e22',
-  realm: '#e74c3c',
-  demo: '#4a9eff',
+  realm: '#f85149',
+  demo: '#38BDF8',
 };
 
 export const layers = [
-  { name: 'Realm', key: 'realm', color: '#e74c3c', osi: 'Application (L7)', desc: 'P2P RPC, Pub/Sub, CRDT' },
+  { name: 'Realm', key: 'realm', color: '#f85149', osi: 'Application (L7)', desc: 'P2P RPC, Pub/Sub, CRDT' },
   { name: 'Rune', key: 'rune', color: '#e67e22', osi: 'Presentation (L6)', desc: 'Trust, attestations, capabilities' },
-  { name: 'Saga', key: 'saga', color: '#f1c40f', osi: 'Session (L5)', desc: 'Content addressing, intents' },
-  { name: 'Veil', key: 'veil', color: '#2ecc71', osi: 'Transport (L4)', desc: 'Encryption, stream mux' },
-  { name: 'Yggdrasil', key: 'yggdrasil', color: '#3498db', osi: 'Network (L3)', desc: 'Identity, DHT, routing' },
-  { name: 'Bifrost', key: 'bifrost', color: '#9b59b6', osi: 'Data Link (L2)', desc: 'Frame codec, transport' },
+  { name: 'Saga', key: 'saga', color: '#FACC15', osi: 'Session (L5)', desc: 'Content addressing, intents' },
+  { name: 'Veil', key: 'veil', color: '#4ECB71', osi: 'Transport (L4)', desc: 'Encryption, stream mux' },
+  { name: 'Yggdrasil', key: 'yggdrasil', color: '#58A6FF', osi: 'Network (L3)', desc: 'Identity, DHT, routing' },
+  { name: 'Bifrost', key: 'bifrost', color: '#8957E5', osi: 'Data Link (L2)', desc: 'Frame codec, transport' },
 ] as const;
 
 // --- Typography ---

@@ -59,8 +59,8 @@ export function StackView({ activeLayer }: StackViewProps) {
                 transition={{ delay: i * 0.08 }}
                 onClick={() => setFilter(isFiltered ? null : layer.key)}
                 style={{
-                  background: isActive ? layer.color : `${layer.color}22`,
-                  border: `2px solid ${isFiltered ? '#fff' : layer.color}`,
+                  background: isActive ? layer.color : `${layer.color}15`,
+                  border: `2px solid ${isFiltered ? colors.textPrimary : layer.color}`,
                   borderRadius: 8,
                   padding: '12px 16px',
                   cursor: 'pointer',
@@ -69,10 +69,10 @@ export function StackView({ activeLayer }: StackViewProps) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <span style={{ fontWeight: 700, color: '#fff', fontSize: 16 }}>
+                    <span style={{ fontWeight: 700, color: colors.textPrimary, fontSize: 16 }}>
                       {layer.name}
                     </span>
-                    <span style={{ color: isActive ? 'rgba(255,255,255,0.8)' : colors.textSecondary, marginLeft: 12, fontSize: 13 }}>
+                    <span style={{ color: isActive ? 'rgba(255,255,255,0.8)' : colors.textMuted, marginLeft: 12, fontSize: 13 }}>
                       {layer.desc}
                     </span>
                   </div>

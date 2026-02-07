@@ -137,8 +137,8 @@ export function ApiDocs({ onClose }: { onClose: () => void }) {
                       <button
                         onClick={() => setExpandedOp(open ? null : id)}
                         style={{
-                          width: '100%', textAlign: 'left', background: open ? 'rgba(74,158,255,0.06)' : colors.surface3,
-                          border: `1px solid ${open ? 'rgba(74,158,255,0.25)' : colors.borderSubtle}`,
+                          width: '100%', textAlign: 'left', background: open ? 'rgba(56,189,248,0.06)' : colors.surface3,
+                          border: `1px solid ${open ? 'rgba(56,189,248,0.25)' : colors.borderSubtle}`,
                           borderRadius: radius.sm, padding: '8px 12px', cursor: 'pointer',
                           display: 'flex', alignItems: 'center', gap: 10, transition: 'background 0.15s',
                         }}
@@ -182,7 +182,7 @@ export function ApiDocs({ onClose }: { onClose: () => void }) {
 function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button onClick={onClick} style={{
-      background: active ? 'rgba(74,158,255,0.15)' : 'transparent',
+      background: active ? 'rgba(56,189,248,0.15)' : 'transparent',
       border: `1px solid ${active ? colors.accentBlue : colors.borderSubtle}`,
       color: active ? colors.accentBlue : colors.textDim,
       borderRadius: radius.full, padding: '3px 12px', fontSize: 11, cursor: 'pointer',
@@ -208,7 +208,7 @@ function MethodBadge({ method }: { method: string }) {
 
 function OpDetail({ op }: { op: OAOp }) {
   return (
-    <div style={{ padding: '10px 14px', borderLeft: `2px solid rgba(74,158,255,0.2)`, marginLeft: 6, marginTop: 2 }}>
+    <div style={{ padding: '10px 14px', borderLeft: `2px solid rgba(56,189,248,0.2)`, marginLeft: 6, marginTop: 2 }}>
       {op.description && <p style={{ margin: '0 0 8px', fontSize: 13, color: colors.textSecondary, lineHeight: 1.5 }}>{op.description}</p>}
 
       {op.parameters && op.parameters.length > 0 && (

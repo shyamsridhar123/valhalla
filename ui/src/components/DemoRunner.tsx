@@ -183,7 +183,7 @@ export function DemoRunner() {
             key={mode}
             onClick={() => setDemoMode(mode)}
             style={{
-              background: demoMode === mode ? 'rgba(74,158,255,0.15)' : 'none',
+              background: demoMode === mode ? 'rgba(56,189,248,0.15)' : 'none',
               border: `1px solid ${demoMode === mode ? colors.accentBlue : colors.borderDefault}`,
               borderRadius: 6,
               padding: '5px 14px',
@@ -214,7 +214,7 @@ export function DemoRunner() {
                 gap: 8,
                 padding: '8px 20px',
                 borderBottom: `1px solid ${colors.borderSubtle}`,
-                background: 'rgba(74,158,255,0.04)',
+                background: 'rgba(56,189,248,0.04)',
                 flexShrink: 0,
               }}
             >
@@ -342,11 +342,11 @@ export function DemoRunner() {
                       disabled={scenarios.length === 0}
                       style={{
                         background:
-                          'linear-gradient(135deg, #4a9eff, #7b68ee)',
+                          'linear-gradient(135deg, #38BDF8, #FACC15)',
                         border: 'none',
                         borderRadius: 8,
                         padding: '10px 20px',
-                        color: '#fff',
+                        color: '#0D1117',
                         fontSize: 13,
                         fontWeight: 700,
                         cursor:

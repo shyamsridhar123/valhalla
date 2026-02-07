@@ -1,15 +1,54 @@
 <p align="center">
-  <strong>⚡ Valhalla</strong><br>
-  <em>An overlay network protocol stack built in Go</em>
+  <img src="assets/branding/banner.svg" alt="Valhalla — A Post-IP Networking Stack" width="100%" />
+</p>
+
+<p align="center">
+  <strong>A 6-layer overlay network protocol stack built in Go</strong>
+</p>
+
+<p align="center">
+  <a href="#quick-start"><img src="https://img.shields.io/badge/go-1.24+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.24+" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
+  <a href="#tech-stack"><img src="https://img.shields.io/badge/deps-3_external-success?style=flat-square" alt="3 External Deps" /></a>
+  <a href="#quick-start"><img src="https://img.shields.io/badge/deploy-single_binary-blueviolet?style=flat-square" alt="Single Binary" /></a>
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> &nbsp;&bull;&nbsp;
+  <a href="#the-stack">The Stack</a> &nbsp;&bull;&nbsp;
+  <a href="#quick-start">Quick Start</a> &nbsp;&bull;&nbsp;
+  <a href="#demo-scenarios">Demos</a> &nbsp;&bull;&nbsp;
+  <a href="#documentation">Docs</a> &nbsp;&bull;&nbsp;
+  <a href="#comparable-projects">Compare</a>
 </p>
 
 ---
 
-Valhalla is a **6-layer overlay network stack** that runs on top of existing TCP/IP infrastructure. It implements cryptographic identity, content addressing, and mandatory encryption as an application-level protocol suite — similar in approach to [libp2p](https://libp2p.io/), [Yggdrasil Network](https://yggdrasil-network.github.io/), or [Tailscale](https://tailscale.com/).
+## Overview
 
-Every node is identified by its Ed25519 keypair (not IP addresses). There is no DNS or Certificate Authority dependency. All communication is encrypted by default.
+Valhalla is a **6-layer overlay network stack** that runs on top of existing TCP/IP infrastructure. It implements cryptographic identity, content addressing, and mandatory encryption as an application-level protocol suite — similar in approach to [libp2p](https://libp2p.io/), [Yggdrasil Network](https://yggdrasil-network.github.io/), and [Tailscale](https://tailscale.com/).
 
-> **Important:** Valhalla does not replace the OS TCP/IP stack. It builds a new protocol stack *above* it. The six Valhalla layers are application-level abstractions that handle identity, routing, encryption, content addressing, trust, and application services within the overlay. The underlying OS kernel still handles actual L1–L4 networking (Ethernet, IP, TCP). Think of it as a "network stack within the application layer" — the same architectural pattern used by Tor, I2P, and libp2p.
+<table>
+<tr>
+<td width="72" align="center">
+  <img src="assets/branding/logo-dark.svg" width="56" alt="Valhalla logo" />
+</td>
+<td>
+
+**Every node is its Ed25519 keypair.** No IP addresses. No DNS. No Certificate Authorities. All communication is encrypted by default. The stack runs entirely in application space — the same architectural pattern used by Tor, I2P, and libp2p.
+
+</td>
+</tr>
+</table>
+
+> [!NOTE]
+> Valhalla does not replace the OS TCP/IP stack. It builds a new protocol stack *above* it. The six layers are application-level abstractions that handle identity, routing, encryption, content addressing, trust, and application services. The underlying kernel still handles actual L1–L4 networking (Ethernet, IP, TCP).
+
+## The Stack
+
+<p align="center">
+  <img src="assets/branding/logo.svg" alt="Valhalla Stack Symbol" width="180" />
+</p>
 
 ```
                               Valhalla Overlay Stack
@@ -37,39 +76,98 @@ Every node is identified by its Ed25519 keypair (not IP addresses). There is no 
                     └──────────────────────────────────────┘
 ```
 
-## Stack Layers
+### Layer Reference
 
-Each layer is an application-level abstraction. The numbering is internal to Valhalla and does not correspond to OSI layer numbers (e.g., Bifrost is labeled "Layer 1" but operates above the OS transport layer, not at the physical layer).
+| # | Layer | Codename | Purpose | Key Primitives |
+|:-:|-------|----------|---------|----------------|
+| 6 | Application | **Realm** | P2P application services | RPC, topic pub/sub, LWW-Register CRDTs |
+| 5 | Trust | **Rune** | Decentralized trust | Signed attestations, capability tokens, reputation |
+| 4 | Content | **Saga** | Content-addressed data | SHA-256 CIDs, intent-based service discovery |
+| 3 | Encryption | **Veil** | Mandatory encryption | Noise XX handshake, ChaCha20-Poly1305, stream mux |
+| 2 | Mesh | **Yggdrasil** | Peer discovery & routing | Ed25519 identity, Kademlia DHT, k-buckets |
+| 1 | Bridge | **Bifrost** | Transport framing | Frames over TCP, WebSocket, UDP |
 
-| # | Layer | Codename | What It Does |
-|---|-------|----------|--------------|
-| 6 | Application | **Realm** | P2P RPC, topic-based pub/sub, LWW-Register CRDTs |
-| 5 | Trust | **Rune** | Decentralized trust via signed attestations and capability tokens |
-| 4 | Content | **Saga** | Content-addressed data (SHA-256 CIDs), intent-based service discovery |
-| 3 | Encryption | **Veil** | Noise protocol handshake, ChaCha20-Poly1305, stream multiplexing |
-| 2 | Mesh | **Yggdrasil** | Ed25519 identity, Kademlia k-bucket routing, DHT peer discovery |
-| 1 | Bridge | **Bifrost** | Frames and tunnels over existing transports (TCP, WebSocket, UDP) |
+> **Relationship to OSI:** In OSI terms, the entire Valhalla stack runs at Layer 7 (Application). The internal layer numbering is a conceptual decomposition — the same pattern used by libp2p, Tor, and CJDNS.
 
-### Relationship to OSI
+### Norse Mythology Naming
 
-Valhalla's layers are **conceptually inspired** by the OSI model but do not replace it. In OSI terms, the entire Valhalla stack runs at Layer 7 (Application). Within that, Valhalla decomposes concerns that traditional networking spreads across layers — identity, encryption, routing, content addressing — into its own layered abstraction. This is the same pattern used by libp2p, Tor, and CJDNS.
+| Layer | Name | Inspiration |
+|:-----:|------|-------------|
+| 1 | **Bifrost** | The rainbow bridge between worlds — bridges old and new networks |
+| 2 | **Yggdrasil** | The world tree connecting all realms — mesh connecting all nodes |
+| 3 | **Veil** | A shroud over all communication — encryption |
+| 4 | **Saga** | Stories that persist beyond their teller — content-addressed data |
+| 5 | **Rune** | Inscriptions of power and authority — trust and capabilities |
+| 6 | **Realm** | The world built on top — applications |
+
+---
 
 ## Quick Start
 
 ```bash
 # Prerequisites: Go 1.24+, Node 18+
+git clone https://github.com/valhalla/valhalla.git
+cd valhalla
 
-cd ui && npm install      # Install frontend dependencies (first time only)
-cd ..
-make build                # Build single binary (Go + embedded React UI)
-./bin/valhalla --demo     # Start 6-node mesh with web UI on :8080
+cd ui && npm install && cd ..   # Install frontend deps (first time)
+make build                      # Build single binary (Go + embedded React UI)
+./bin/valhalla --demo           # Start 6-node mesh with web UI on :8080
 ```
 
-Open **http://localhost:8080** — the UI is embedded in the binary. The demo shows:
+Open **http://localhost:8080** — the UI is embedded in the binary.
 
-- **Network topology** — D3 force-directed graph of live mesh connections
-- **Stack visualization** — Per-node 6-layer activity with real-time event flow
-- **Scenario runner** — Guided demos with narration timeline and interactive sandbox
+### What You'll See
+
+| Feature | Description |
+|---------|-------------|
+| **Network Topology** | D3 force-directed graph of live mesh connections |
+| **Stack Visualization** | Per-node 6-layer activity with real-time event flow |
+| **Scenario Runner** | Guided demos with narration timeline and interactive sandbox |
+
+---
+
+## Demo Scenarios
+
+| Scenario | What Happens |
+|----------|--------------|
+| **Mesh Formation** | 6 nodes discover each other and form a mesh network |
+| **Encrypted Chat** | Two nodes establish encrypted communication and exchange messages |
+| **Content Sharing** | Content published by one node is discovered and retrieved by another |
+| **Trust Web** | Nodes build a web of trust through attestations |
+| **Service Discovery** | A node discovers and connects to a service provided by another node |
+| **State Sync** | Nodes synchronize shared state using CRDTs |
+
+---
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| **Core** | Go 1.24 — goroutines, stdlib `net`, `crypto` |
+| **Crypto** | Ed25519, Noise XX ([flynn/noise](https://github.com/flynn/noise)), ChaCha20-Poly1305, HKDF |
+| **Transport** | TCP, WebSocket ([nhooyr.io/websocket](https://github.com/nhooyr/websocket)) |
+| **Routing** | Kademlia DHT, XOR distance, k-buckets |
+| **Frontend** | React 19, TypeScript, Vite, D3.js, Zustand, Framer Motion |
+| **Deployment** | Single binary via `go:embed` |
+
+> **External Go dependencies: 3** — `golang.org/x/crypto`, `flynn/noise`, `nhooyr.io/websocket`. Everything else is stdlib.
+
+---
+
+## Development
+
+```bash
+make ui-install  # Install frontend deps (first time)
+make dev         # Dev mode — Go API on :8080 + Vite HMR on :5173
+make build       # Production build → ./bin/valhalla (UI embedded)
+make test        # Run all tests with race detector
+make bench       # Benchmarks (framing, types)
+make clean       # Clean build artifacts
+```
+
+In dev mode, open **http://localhost:5173** — Vite proxies API calls to the Go backend on `:8080`.
+
+---
 
 ## Project Structure
 
@@ -93,71 +191,30 @@ ui/                          React 19 + TypeScript + Vite + D3.js + Zustand
 └── src/utils/               D3 helpers
 ```
 
-## Tech Stack
+---
 
-| Component | Technology |
-|-----------|-----------|
-| Core | Go 1.24 — goroutines, stdlib `net`, `crypto` |
-| Crypto | Ed25519, Noise XX ([flynn/noise](https://github.com/flynn/noise)), ChaCha20-Poly1305, HKDF |
-| Transport | TCP, WebSocket ([nhooyr.io/websocket](https://github.com/nhooyr/websocket)) |
-| Routing | Kademlia DHT, XOR distance, k-buckets |
-| Frontend | React 19, TypeScript, Vite, D3.js, Zustand, Framer Motion |
-| Deployment | Single binary via `go:embed` |
+## How It Works
 
-> **External Go dependencies: 3** — `golang.org/x/crypto`, `flynn/noise`, `nhooyr.io/websocket`. Everything else is stdlib.
+In the current PoC, all Valhalla nodes run as **goroutines within a single process**. Demo mode uses in-memory connections between nodes (no actual TCP traffic), making the demo deterministic and easy to run.
 
-## Development
+In non-demo mode, nodes communicate over real TCP/WebSocket connections on the OS TCP/IP stack. Valhalla adds its own framing (Bifrost), routing (Yggdrasil), encryption (Veil), and higher-level services on top.
 
-```bash
-make ui-install  # Install frontend deps (first time)
-make dev         # Dev mode — Go API on :8080 + Vite HMR on :5173
-make build       # Production build → ./bin/valhalla (UI embedded)
-make test        # Run all tests with race detector
-make bench       # Benchmarks (framing, types)
-make clean       # Clean build artifacts
-```
-
-In dev mode, open **http://localhost:5173** — Vite proxies API calls to the Go backend on `:8080`.
-
-## Demo Scenarios
-
-| Scenario | Description |
-|----------|-------------|
-| Mesh Formation | 6 nodes discover each other and form a mesh network |
-| Encrypted Chat | Two nodes establish encrypted communication and exchange messages |
-| Content Sharing | Content published by one node is discovered and retrieved by another |
-| Trust Web | Nodes build a web of trust through attestations |
-| Service Discovery | A node discovers and connects to a service provided by another node |
-| State Sync | Nodes synchronize shared state using CRDTs |
-
-## Naming
-
-Each layer is named after Norse mythology:
-
-| Layer | Name | Meaning |
-|-------|------|---------|
-| 1 | **Bifrost** | The rainbow bridge between worlds — bridges old and new networks |
-| 2 | **Yggdrasil** | The world tree connecting all realms — mesh connecting all nodes |
-| 3 | **Veil** | The shroud over all communication — encryption |
-| 4 | **Saga** | Stories that persist beyond their teller — content-addressed data |
-| 5 | **Rune** | Inscriptions of power and authority — trust and capabilities |
-| 6 | **Realm** | The world built on top — applications |
+---
 
 ## Documentation
 
 Detailed design documents are in [`docs/`](docs/):
 
-- [Vision & Motivation](docs/00-vision.md) — What's wrong with the current internet stack
-- [Architecture](docs/01-architecture.md) — Full 6-layer stack design with wire formats
-- [PoC Design](docs/02-poc-design.md) — Technical design for the proof of concept
-- [Implementation Plan](docs/03-implementation-plan.md) — Phased build plan
-- [Tech Decisions](docs/04-tech-decision.md) — Why Go, why these dependencies
+| Document | Description |
+|----------|-------------|
+| [Vision & Motivation](docs/00-vision.md) | What's wrong with the current internet stack |
+| [Architecture](docs/01-architecture.md) | Full 6-layer stack design with wire formats |
+| [PoC Design](docs/02-poc-design.md) | Technical design for the proof of concept |
+| [Implementation Plan](docs/03-implementation-plan.md) | Phased build plan |
+| [Tech Decisions](docs/04-tech-decision.md) | Why Go, why these dependencies |
+| [API Reference](docs/05-api-reference.md) | REST + WebSocket API documentation |
 
-## How It Works
-
-In the current PoC, all Valhalla nodes run as goroutines within a single process. The demo mode uses in-memory connections between nodes (no actual TCP traffic between them). This makes the demo deterministic and easy to run, but it means the "network" is simulated within the application.
-
-When running in non-demo mode, nodes communicate over real TCP/WebSocket connections — but these ride on the OS TCP/IP stack. Valhalla adds its own framing (Bifrost), routing (Yggdrasil), encryption (Veil), and higher-level services on top.
+---
 
 ## Comparable Projects
 
@@ -169,10 +226,20 @@ When running in non-demo mode, nodes communicate over real TCP/WebSocket connect
 | [Tailscale](https://tailscale.com/) | WireGuard overlay, crypto identity | Production VPN, centralized coordination |
 | [I2P](https://geti2p.net/) | Layered overlay, encrypted transport | Focus on anonymity, garlic routing |
 
+---
+
 ## Disclaimer
 
+> [!CAUTION]
 > **This is an experimental proof-of-concept.** It demonstrates overlay network architecture concepts through a working simulation. It is not production-ready, not audited, and not suitable for any security-critical use. The cryptographic implementations have not been reviewed. The demo network runs in-memory within a single process. Use at your own risk.
 
 ## License
 
 [MIT](LICENSE)
+
+---
+
+<p align="center">
+  <img src="assets/branding/valhalla-logo.svg" alt="Valhalla" width="64" /><br>
+  <sub>Built with Go, secured by cryptography, inspired by Norse mythology.</sub>
+</p>

@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#glow-sm)">
+<path d="M32 10V54" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+<path d="M32 20L20 12" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+<path d="M32 20L44 12" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+<path d="M32 44L20 52" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+<path d="M32 44L44 52" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+</g>
+<path d="M32 28L26 36H38L32 28Z" fill="#FACC15"/>
+<defs>
+<filter id="glow-sm" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+</svg>

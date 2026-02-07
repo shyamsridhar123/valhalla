@@ -3,23 +3,27 @@
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #0f0f23;
+  color: #E6EDF3;
+  background-color: #0D1117;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --surface-0: #0f0f23;
-  --surface-1: #1a1a2e;
-  --surface-2: #0d0d1a;
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.08);
-  --accent-blue: #4a9eff;
-  --accent-green: #2ecc71;
-  --accent-red: #e74c3c;
-  --text-primary: rgba(255, 255, 255, 0.87);
-  --text-muted: #888;
+  --surface-0: #0D1117;
+  --surface-1: #161B22;
+  --surface-2: #0D1117;
+  --border-subtle: rgba(48, 54, 61, 0.4);
+  --border-default: #30363d;
+  --accent-blue: #38BDF8;
+  --accent-gold: #FACC15;
+  --accent-green: #4ECB71;
+  --accent-red: #f85149;
+  --accent-purple: #8957E5;
+  --accent-teal: #4ECDC4;
+  --text-primary: #E6EDF3;
+  --text-secondary: #c9d1d9;
+  --text-muted: #8b949e;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 

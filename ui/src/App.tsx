@@ -35,34 +35,38 @@ function App() {
   const lastLayerEvent = [...events].reverse().find((e) => e.layer !== 'demo');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: colors.surface0, color: '#fff' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: colors.surface0, color: colors.textPrimary }}>
       {/* Header */}
       <header style={{
-        padding: '12px 24px',
-        borderBottom: '1px solid rgba(74, 158, 255, 0.15)',
+        padding: '10px 24px',
+        borderBottom: `1px solid ${colors.borderDefault}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        background: 'linear-gradient(180deg, rgba(74, 158, 255, 0.04) 0%, transparent 100%)',
+        background: `linear-gradient(180deg, ${colors.surface1} 0%, ${colors.surface0} 100%)`,
+        flexShrink: 0,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <h1 style={{
-            margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: 3,
-            background: 'linear-gradient(135deg, #4a9eff, #7b68ee)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>VALHALLA</h1>
-          <span style={{ color: colors.textDim, fontSize: 12, fontWeight: 500 }}>Proof of Concept</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <img src="/valhalla-logo.svg" alt="Valhalla" width={32} height={32} style={{ display: 'block' }} />
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+            <h1 style={{
+              margin: 0, fontSize: 18, fontWeight: 800, letterSpacing: 3,
+              background: 'linear-gradient(135deg, #38BDF8, #FACC15)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>VALHALLA</h1>
+            <span style={{ color: colors.textDim, fontSize: 11, fontWeight: 500, letterSpacing: 0.5 }}>Post-IP Networking Stack</span>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
             onClick={() => setShowApiDocs(true)}
             style={{
-              background: 'rgba(74, 158, 255, 0.08)',
-              border: '1px solid rgba(74, 158, 255, 0.25)',
+              background: `rgba(56, 189, 248, 0.08)`,
+              border: `1px solid rgba(56, 189, 248, 0.25)`,
               color: colors.accentBlue,
               borderRadius: 6,
-              padding: '4px 12px',
+              padding: '5px 14px',
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
@@ -72,19 +76,21 @@ function App() {
           >
             API Docs
           </button>
-          <div style={{
-            width: 6, height: 6, borderRadius: '50%',
-            background: nodes.length > 0 ? colors.online : colors.offline,
-            boxShadow: nodes.length > 0 ? `0 0 8px ${colors.online}60` : 'none',
-          }} />
-          <span style={{ color: nodes.length > 0 ? colors.textSecondary : colors.accentRed, fontSize: 13 }}>
-            {nodes.length > 0 ? `${nodes.length} nodes` : 'Disconnected'}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, background: nodes.length > 0 ? 'rgba(78, 203, 113, 0.08)' : 'rgba(248, 81, 73, 0.08)', border: `1px solid ${nodes.length > 0 ? 'rgba(78, 203, 113, 0.25)' : 'rgba(248, 81, 73, 0.25)'}` }}>
+            <div style={{
+              width: 6, height: 6, borderRadius: '50%',
+              background: nodes.length > 0 ? colors.online : colors.offline,
+              boxShadow: nodes.length > 0 ? `0 0 8px ${colors.online}60` : 'none',
+            }} />
+            <span style={{ color: nodes.length > 0 ? colors.online : colors.offline, fontSize: 12, fontWeight: 600 }}>
+              {nodes.length > 0 ? `${nodes.length} nodes` : 'Disconnected'}
+            </span>
+          </div>
         </div>
       </header>
 
       {/* Tabs */}
-      <nav style={{ display: 'flex', borderBottom: `1px solid ${colors.borderDefault}`, paddingLeft: 24, position: 'relative' }}>
+      <nav style={{ display: 'flex', borderBottom: `1px solid ${colors.borderDefault}`, paddingLeft: 24, position: 'relative', background: colors.surface1 }}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -95,11 +101,11 @@ function App() {
                 background: 'none',
                 border: 'none',
                 borderBottom: isActive ? `2px solid ${colors.accentBlue}` : '2px solid transparent',
-                color: isActive ? '#fff' : colors.textDim,
-                padding: '12px 20px',
+                color: isActive ? colors.textPrimary : colors.textDim,
+                padding: '10px 20px',
                 cursor: 'pointer',
                 fontSize: 13,
-                fontWeight: isActive ? 700 : 400,
+                fontWeight: isActive ? 700 : 500,
                 transition: 'all 0.2s ease',
                 letterSpacing: 0.3,
               }}

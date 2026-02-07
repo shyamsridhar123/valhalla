@@ -95,7 +95,7 @@ function MeshFormationViz({
   const visibleNodes = Math.min(Math.max(step - 1, 0), 6);
   const meshFormed = step >= 7;
   const names = ['Alice', 'Bob', 'Carol', 'Dave', 'Eve', 'Frank'];
-  const nodeColors = ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6', '#e67e22'];
+  const nodeColors = ['#58A6FF', '#4ECB71', '#f85149', '#FACC15', '#8957E5', '#e67e22'];
 
   const positions = useMemo(() => {
     const cx = 250, cy = 200, r = 140;
@@ -254,8 +254,8 @@ function EncryptedChatViz({
     <svg width="500" height="360" viewBox="0 0 500 360" style={{ maxWidth: '100%', maxHeight: '100%' }}>
       <defs>
         <linearGradient id="chat-path-grad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#2ecc71" />
-          <stop offset="100%" stopColor="#e74c3c" />
+          <stop offset="0%" stopColor="#4ECB71" />
+          <stop offset="100%" stopColor="#f85149" />
         </linearGradient>
       </defs>
 
@@ -283,14 +283,14 @@ function EncryptedChatViz({
         animate={{ opacity: 1, x: 0 }}
         transition={{ type: 'spring', stiffness: 150 }}
       >
-        <circle cx={100} cy={160} r={40} fill="#2ecc7118" stroke="#2ecc71" strokeWidth={2} />
-        <text x={100} y={155} textAnchor="middle" fill="#2ecc71" fontSize={24} fontWeight={800}>A</text>
+        <circle cx={100} cy={160} r={40} fill="#4ECB7118" stroke="#4ECB71" strokeWidth={2} />
+        <text x={100} y={155} textAnchor="middle" fill="#4ECB71" fontSize={24} fontWeight={800}>A</text>
         <text x={100} y={175} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={600} fontFamily={fonts.ui}>Alice</text>
         {/* Encrypt indicator */}
         {isAnimating && (
           <m.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
-            <rect x={80} y={210} width={40} height={18} rx={4} fill="#2ecc7125" stroke="#2ecc71" strokeWidth={1} />
-            <text x={100} y={223} textAnchor="middle" fill="#2ecc71" fontSize={9} fontWeight={600}>ENCRYPT</text>
+            <rect x={80} y={210} width={40} height={18} rx={4} fill="#4ECB7125" stroke="#4ECB71" strokeWidth={1} />
+            <text x={100} y={223} textAnchor="middle" fill="#4ECB71" fontSize={9} fontWeight={600}>ENCRYPT</text>
           </m.g>
         )}
       </m.g>
@@ -301,14 +301,14 @@ function EncryptedChatViz({
         animate={{ opacity: 1, x: 0 }}
         transition={{ type: 'spring', stiffness: 150, delay: 0.1 }}
       >
-        <circle cx={400} cy={160} r={40} fill="#e74c3c18" stroke="#e74c3c" strokeWidth={2} />
-        <text x={400} y={155} textAnchor="middle" fill="#e74c3c" fontSize={24} fontWeight={800}>B</text>
+        <circle cx={400} cy={160} r={40} fill="#f8514918" stroke="#f85149" strokeWidth={2} />
+        <text x={400} y={155} textAnchor="middle" fill="#f85149" fontSize={24} fontWeight={800}>B</text>
         <text x={400} y={175} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={600} fontFamily={fonts.ui}>Bob</text>
         {/* Decrypt indicator */}
         {isAnimating && (
           <m.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}>
-            <rect x={380} y={210} width={40} height={18} rx={4} fill="#e74c3c25" stroke="#e74c3c" strokeWidth={1} />
-            <text x={400} y={223} textAnchor="middle" fill="#e74c3c" fontSize={9} fontWeight={600}>DECRYPT</text>
+            <rect x={380} y={210} width={40} height={18} rx={4} fill="#f8514925" stroke="#f85149" strokeWidth={1} />
+            <text x={400} y={223} textAnchor="middle" fill="#f85149" fontSize={9} fontWeight={600}>DECRYPT</text>
           </m.g>
         )}
       </m.g>
@@ -361,8 +361,8 @@ function EncryptedChatViz({
       >
         <m.path
           d="M 245 110 L 250 105 L 255 110 L 255 122 Q 250 126 245 122 Z"
-          fill="#2ecc7130"
-          stroke="#2ecc71"
+          fill="#4ECB7130"
+          stroke="#4ECB71"
           strokeWidth={1}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -392,14 +392,14 @@ function ContentSharingViz({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <circle cx={80} cy={160} r={36} fill="#f1c40f15" stroke="#f1c40f" strokeWidth={2} />
-        <text x={80} y={152} textAnchor="middle" fill="#f1c40f" fontSize={11} fontWeight={700}>Node 0</text>
+        <circle cx={80} cy={160} r={36} fill="#FACC1515" stroke="#FACC15" strokeWidth={2} />
+        <text x={80} y={152} textAnchor="middle" fill="#FACC15" fontSize={11} fontWeight={700}>Node 0</text>
         <text x={80} y={168} textAnchor="middle" fill={colors.textDim} fontSize={9}>Publisher</text>
 
         {/* Document icon */}
-        <rect x={65} y={200} width={30} height={36} rx={3} fill="none" stroke="#f1c40f" strokeWidth={1} opacity={0.5} />
+        <rect x={65} y={200} width={30} height={36} rx={3} fill="none" stroke="#FACC15" strokeWidth={1} opacity={0.5} />
         {[210, 216, 222, 228].map((y) => (
-          <line key={y} x1={70} y1={y} x2={90} y2={y} stroke="#f1c40f" strokeWidth={0.6} opacity={0.3} />
+          <line key={y} x1={70} y1={y} x2={90} y2={y} stroke="#FACC15" strokeWidth={0.6} opacity={0.3} />
         ))}
       </m.g>
 
@@ -410,7 +410,7 @@ function ContentSharingViz({
           y1={160}
           x2={210}
           y2={160}
-          stroke="#f1c40f"
+          stroke="#FACC15"
           strokeWidth={1.5}
           strokeDasharray="6,4"
           initial={{ opacity: 0 }}
@@ -432,9 +432,9 @@ function ContentSharingViz({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring' }}
         >
-          <rect x={220} y={130} width={80} height={60} rx={8} fill="#2ecc7115" stroke="#2ecc71" strokeWidth={1.5} />
-          <text x={260} y={152} textAnchor="middle" fill="#2ecc71" fontSize={10} fontWeight={700}>SHA-256</text>
-          <text x={260} y={168} textAnchor="middle" fill="#2ecc71" fontSize={18}>#{'{'}CID{'}'}</text>
+          <rect x={220} y={130} width={80} height={60} rx={8} fill="#4ECB7115" stroke="#4ECB71" strokeWidth={1.5} />
+          <text x={260} y={152} textAnchor="middle" fill="#4ECB71" fontSize={10} fontWeight={700}>SHA-256</text>
+          <text x={260} y={168} textAnchor="middle" fill="#4ECB71" fontSize={18}>#{'{'}CID{'}'}</text>
           <text x={260} y={182} textAnchor="middle" fill={colors.textDim} fontSize={8} fontFamily={fonts.mono}>content-addressed</text>
         </m.g>
       )}
@@ -446,7 +446,7 @@ function ContentSharingViz({
           y1={160}
           x2={404}
           y2={160}
-          stroke="#2ecc71"
+          stroke="#4ECB71"
           strokeWidth={1.5}
           strokeDasharray="6,4"
           initial={{ opacity: 0 }}
@@ -468,8 +468,8 @@ function ContentSharingViz({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <circle cx={440} cy={160} r={36} fill="#2ecc7115" stroke="#2ecc71" strokeWidth={2} />
-          <text x={440} y={152} textAnchor="middle" fill="#2ecc71" fontSize={11} fontWeight={700}>Node 4</text>
+          <circle cx={440} cy={160} r={36} fill="#4ECB7115" stroke="#4ECB71" strokeWidth={2} />
+          <text x={440} y={152} textAnchor="middle" fill="#4ECB71" fontSize={11} fontWeight={700}>Node 4</text>
           <text x={440} y={168} textAnchor="middle" fill={colors.textDim} fontSize={9}>Retriever</text>
         </m.g>
       )}
@@ -481,8 +481,8 @@ function ContentSharingViz({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', delay: 0.3 }}
         >
-          <circle cx={260} cy={230} r={16} fill="#2ecc7130" stroke="#2ecc71" strokeWidth={1.5} />
-          <text x={260} y={235} textAnchor="middle" fill="#2ecc71" fontSize={16} fontWeight={700}>✓</text>
+          <circle cx={260} cy={230} r={16} fill="#4ECB7130" stroke="#4ECB71" strokeWidth={1.5} />
+          <text x={260} y={235} textAnchor="middle" fill="#4ECB71" fontSize={16} fontWeight={700}>✓</text>
           <text x={260} y={260} textAnchor="middle" fill={colors.textDim} fontSize={10}>Signature verified</text>
         </m.g>
       )}
@@ -505,8 +505,8 @@ function TrustWebViz({
 
   const nodes = [
     { x: 250, y: 80, name: 'Alice', color: '#e67e22' },
-    { x: 120, y: 260, name: 'Bob', color: '#3498db' },
-    { x: 380, y: 260, name: 'Carol', color: '#2ecc71' },
+    { x: 120, y: 260, name: 'Bob', color: '#58A6FF' },
+    { x: 380, y: 260, name: 'Carol', color: '#4ECB71' },
   ];
 
   return (
@@ -542,7 +542,7 @@ function TrustWebViz({
             y1={nodes[1].y}
             x2={nodes[2].x - 35}
             y2={nodes[2].y}
-            stroke="#3498db"
+            stroke="#58A6FF"
             strokeWidth={2}
             strokeDasharray="8,4"
             animate={{ strokeDashoffset: [0, -24] }}
@@ -550,8 +550,8 @@ function TrustWebViz({
           />
           {showScores && (
             <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <rect x={225} y={248} width={50} height={20} rx={10} fill="#3498db" fillOpacity={0.2} />
-              <text x={250} y={262} textAnchor="middle" fill="#3498db" fontSize={11} fontWeight={700}>0.85</text>
+              <rect x={225} y={248} width={50} height={20} rx={10} fill="#58A6FF" fillOpacity={0.2} />
+              <text x={250} y={262} textAnchor="middle" fill="#58A6FF" fontSize={11} fontWeight={700}>0.85</text>
             </m.g>
           )}
         </m.g>
@@ -565,7 +565,7 @@ function TrustWebViz({
             y1={nodes[0].y + 30}
             x2={nodes[2].x - 20}
             y2={nodes[2].y - 25}
-            stroke="#9b59b6"
+            stroke="#8957E5"
             strokeWidth={1.5}
             strokeDasharray="4,6"
             strokeOpacity={0.5}
@@ -573,8 +573,8 @@ function TrustWebViz({
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           />
           <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-            <rect x={320} y={155} width={68} height={20} rx={10} fill="#9b59b6" fillOpacity={0.2} />
-            <text x={354} y={169} textAnchor="middle" fill="#9b59b6" fontSize={10} fontWeight={600}>0.77 (trans.)</text>
+            <rect x={320} y={155} width={68} height={20} rx={10} fill="#8957E5" fillOpacity={0.2} />
+            <text x={354} y={169} textAnchor="middle" fill="#8957E5" fontSize={10} fontWeight={600}>0.77 (trans.)</text>
           </m.g>
         </m.g>
       )}
@@ -630,15 +630,15 @@ function ServiceDiscoveryViz({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <circle cx={140} cy={160} r={40} fill="#f1c40f15" stroke="#f1c40f" strokeWidth={2} />
-        <text x={140} y={150} textAnchor="middle" fill="#f1c40f" fontSize={10} fontWeight={700}>Node 2</text>
+        <circle cx={140} cy={160} r={40} fill="#FACC1515" stroke="#FACC15" strokeWidth={2} />
+        <text x={140} y={150} textAnchor="middle" fill="#FACC15" fontSize={10} fontWeight={700}>Node 2</text>
         <text x={140} y={166} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={600}>Carol</text>
 
         {/* Service badge */}
         {showProvider && (
           <m.g initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
-            <rect x={105} y={210} width={70} height={22} rx={11} fill="#f1c40f20" stroke="#f1c40f" strokeWidth={1} />
-            <text x={140} y={225} textAnchor="middle" fill="#f1c40f" fontSize={9} fontWeight={600}>file-storage</text>
+            <rect x={105} y={210} width={70} height={22} rx={11} fill="#FACC1520" stroke="#FACC15" strokeWidth={1} />
+            <text x={140} y={225} textAnchor="middle" fill="#FACC15" fontSize={9} fontWeight={600}>file-storage</text>
           </m.g>
         )}
       </m.g>
@@ -649,8 +649,8 @@ function ServiceDiscoveryViz({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <circle cx={380} cy={160} r={40} fill="#e74c3c15" stroke="#e74c3c" strokeWidth={2} />
-        <text x={380} y={150} textAnchor="middle" fill="#e74c3c" fontSize={10} fontWeight={700}>Node 5</text>
+        <circle cx={380} cy={160} r={40} fill="#f8514915" stroke="#f85149" strokeWidth={2} />
+        <text x={380} y={150} textAnchor="middle" fill="#f85149" fontSize={10} fontWeight={700}>Node 5</text>
         <text x={380} y={166} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={600}>Frank</text>
       </m.g>
 
@@ -662,7 +662,7 @@ function ServiceDiscoveryViz({
             cx={380}
             cy={160}
             fill="none"
-            stroke="#e74c3c"
+            stroke="#f85149"
             strokeWidth={1}
             initial={{ r: 40, opacity: 0 }}
             animate={{
@@ -684,7 +684,7 @@ function ServiceDiscoveryViz({
           y1={160}
           x2={340}
           y2={160}
-          stroke="#2ecc71"
+          stroke="#4ECB71"
           strokeWidth={2}
           strokeDasharray="8,4"
           initial={{ opacity: 0 }}
@@ -736,9 +736,9 @@ function StateSyncViz({
   const converged = step >= 8;
 
   const nodes = [
-    { x: 100, name: 'Node 0', color: '#e74c3c' },
-    { x: 260, name: 'Node 1', color: '#3498db' },
-    { x: 420, name: 'Node 2', color: '#2ecc71' },
+    { x: 100, name: 'Node 0', color: '#f85149' },
+    { x: 260, name: 'Node 1', color: '#58A6FF' },
+    { x: 420, name: 'Node 2', color: '#4ECB71' },
   ];
 
   const preSync = [
@@ -761,7 +761,7 @@ function StateSyncViz({
               y1={100}
               x2={nodes[to].x}
               y2={100}
-              stroke="#9b59b6"
+              stroke="#8957E5"
               strokeWidth={1.5}
               strokeDasharray="6,4"
               animate={{
@@ -775,7 +775,7 @@ function StateSyncViz({
             x={260}
             y={80}
             textAnchor="middle"
-            fill="#9b59b6"
+            fill="#8957E5"
             fontSize={11}
             fontWeight={600}
             animate={{ opacity: [0.5, 1, 0.5] }}
@@ -812,14 +812,14 @@ function StateSyncViz({
                   width={140}
                   height={converged ? 44 : 44}
                   rx={6}
-                  fill={converged ? '#2ecc7110' : colors.surface2}
-                  stroke={converged ? '#2ecc71' : colors.borderStrong}
+                  fill={converged ? '#4ECB7110' : colors.surface2}
+                  stroke={converged ? '#4ECB71' : colors.borderStrong}
                   strokeWidth={1}
                 />
                 <text x={node.x} y={207} textAnchor="middle" fill={colors.textDim} fontSize={9} fontFamily={fonts.mono}>
                   {preSync[i][0]}
                 </text>
-                <text x={node.x} y={225} textAnchor="middle" fill={converged ? '#2ecc71' : '#fff'} fontSize={10} fontWeight={600} fontFamily={fonts.mono}>
+                <text x={node.x} y={225} textAnchor="middle" fill={converged ? '#4ECB71' : '#fff'} fontSize={10} fontWeight={600} fontFamily={fonts.mono}>
                   {converged ? postSync : preSync[i][1]}
                 </text>
               </m.g>
@@ -831,8 +831,8 @@ function StateSyncViz({
       {/* Convergence indicator */}
       {converged && (
         <m.g initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring' }}>
-          <circle cx={260} cy={290} r={18} fill="#2ecc7130" stroke="#2ecc71" strokeWidth={1.5} />
-          <text x={260} y={295} textAnchor="middle" fill="#2ecc71" fontSize={18}>✓</text>
+          <circle cx={260} cy={290} r={18} fill="#4ECB7130" stroke="#4ECB71" strokeWidth={1.5} />
+          <text x={260} y={295} textAnchor="middle" fill="#4ECB71" fontSize={18}>✓</text>
           <text x={260} y={325} textAnchor="middle" fill={colors.textDim} fontSize={11} fontFamily={fonts.mono}>
             Last-Writer-Wins convergence
           </text>

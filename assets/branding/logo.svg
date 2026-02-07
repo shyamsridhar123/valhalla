@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="grad_blue" x1="256" y1="80" x2="256" y2="432" gradientUnits="userSpaceOnUse">
+<stop stop-color="#38BDF8"/>
+<stop offset="1" stop-color="#0EA5E9"/>
+</linearGradient>
+<linearGradient id="grad_gold" x1="256" y1="200" x2="256" y2="312" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FACC15"/>
+<stop offset="1" stop-color="#EAB308"/>
+</linearGradient>
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+<feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+<feMerge>
+<feMergeNode in="coloredBlur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+</defs>
+
+<path d="M256 32L449.92 144V368L256 480L62.08 368V144L256 32Z" fill="#0F172A" stroke="#1E293B" stroke-width="8"/>
+
+<g filter="url(#glow)">
+<path d="M256 160V352" stroke="url(#grad_blue)" stroke-width="16" stroke-linecap="round"/>
+
+<path d="M256 160L192 112" stroke="url(#grad_blue)" stroke-width="12" stroke-linecap="round"/>
+<path d="M256 160L320 112" stroke="url(#grad_blue)" stroke-width="12" stroke-linecap="round"/>
+<path d="M256 112V80" stroke="url(#grad_blue)" stroke-width="12" stroke-linecap="round"/>
+
+<path d="M256 352L192 400" stroke="url(#grad_blue)" stroke-width="12" stroke-linecap="round"/>
+<path d="M256 352L320 400" stroke="url(#grad_blue)" stroke-width="12" stroke-linecap="round"/>
+<path d="M256 400V432" stroke="url(#grad_blue)" stroke-width="12" stroke-linecap="round"/>
+
+<circle cx="192" cy="112" r="12" fill="#38BDF8"/>
+<circle cx="320" cy="112" r="12" fill="#38BDF8"/>
+<circle cx="256" cy="80" r="12" fill="#38BDF8"/>
+<circle cx="192" cy="400" r="12" fill="#38BDF8"/>
+<circle cx="320" cy="400" r="12" fill="#38BDF8"/>
+<circle cx="256" cy="432" r="12" fill="#38BDF8"/>
+</g>
+
+<path d="M256 224L224 272H288L256 224Z" fill="url(#grad_gold)"/>
+<path d="M224 272L256 312L288 272" stroke="url(#grad_gold)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+
+<path d="M160 256H352" stroke="#64748B" stroke-width="4" stroke-dasharray="8 12" opacity="0.5"/>
+</svg>

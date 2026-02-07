@@ -30,7 +30,7 @@ function MeshIcon() {
             y1={p1.y}
             x2={p2.x}
             y2={p2.y}
-            stroke="#3498db"
+            stroke="#58A6FF"
             strokeWidth={0.8}
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.5, 0.2] }}
@@ -49,7 +49,7 @@ function MeshIcon() {
           cx={p.x}
           cy={p.y}
           r={5}
-          fill="#3498db"
+          fill="#58A6FF"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
@@ -67,7 +67,7 @@ function LockIcon() {
         cy={44}
         r={10}
         fill="none"
-        stroke="#2ecc71"
+        stroke="#4ECB71"
         strokeWidth={1.5}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -76,7 +76,7 @@ function LockIcon() {
         x={20}
         y={48}
         textAnchor="middle"
-        fill="#2ecc71"
+        fill="#4ECB71"
         fontSize={10}
         fontWeight={700}
       >
@@ -87,7 +87,7 @@ function LockIcon() {
         cy={44}
         r={10}
         fill="none"
-        stroke="#e74c3c"
+        stroke="#f85149"
         strokeWidth={1.5}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -97,7 +97,7 @@ function LockIcon() {
         x={68}
         y={48}
         textAnchor="middle"
-        fill="#e74c3c"
+        fill="#f85149"
         fontSize={10}
         fontWeight={700}
       >
@@ -121,8 +121,8 @@ function LockIcon() {
         width={12}
         height={10}
         rx={2}
-        fill="rgba(46,204,113,0.2)"
-        stroke="#2ecc71"
+        fill="rgba(78,203,113,0.2)"
+        stroke="#4ECB71"
         strokeWidth={1}
         animate={{ opacity: [0.4, 0.9, 0.4] }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -130,7 +130,7 @@ function LockIcon() {
       <m.path
         d="M 42 37 L 42 34 Q 42 30 44 30 Q 46 30 46 34 L 46 37"
         fill="none"
-        stroke="#2ecc71"
+        stroke="#4ECB71"
         strokeWidth={1}
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -149,7 +149,7 @@ function ContentIcon() {
         height={32}
         rx={3}
         fill="none"
-        stroke="#f1c40f"
+        stroke="#FACC15"
         strokeWidth={1.5}
         initial={{ opacity: 0, x: -5 }}
         animate={{ opacity: 1, x: 0 }}
@@ -162,7 +162,7 @@ function ContentIcon() {
           y1={y}
           x2={31}
           y2={y}
-          stroke="#f1c40f"
+          stroke="#FACC15"
           strokeWidth={0.8}
           strokeOpacity={0.4}
           initial={{ opacity: 0 }}
@@ -175,7 +175,7 @@ function ContentIcon() {
         cy={38}
         r={0}
         fill="none"
-        stroke="#2ecc71"
+        stroke="#4ECB71"
         strokeWidth={1}
         animate={{ r: [0, 8, 16], opacity: [0.8, 0.3, 0] }}
         transition={{ duration: 2, repeat: Infinity, delay: 0.8 }}
@@ -186,8 +186,8 @@ function ContentIcon() {
         width={18}
         height={20}
         rx={3}
-        fill="rgba(46,204,113,0.15)"
-        stroke="#2ecc71"
+        fill="rgba(78,203,113,0.15)"
+        stroke="#4ECB71"
         strokeWidth={1}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -197,7 +197,7 @@ function ContentIcon() {
         x={67}
         y={41}
         textAnchor="middle"
-        fill="#2ecc71"
+        fill="#4ECB71"
         fontSize={8}
         fontWeight={600}
       >
@@ -275,7 +275,7 @@ function RadarIcon() {
           cy={44}
           r={r}
           fill="none"
-          stroke="#f1c40f"
+          stroke="#FACC15"
           strokeWidth={0.8}
           initial={{ opacity: 0 }}
           animate={{ opacity: [0, 0.5, 0] }}
@@ -286,13 +286,13 @@ function RadarIcon() {
           }}
         />
       ))}
-      <m.circle cx={44} cy={44} r={5} fill="#f1c40f" />
+      <m.circle cx={44} cy={44} r={5} fill="#FACC15" />
       <m.circle
         cx={68}
         cy={32}
         r={6}
-        fill="rgba(231,76,60,0.3)"
-        stroke="#e74c3c"
+        fill="rgba(248,81,73,0.3)"
+        stroke="#f85149"
         strokeWidth={1}
         animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
@@ -301,7 +301,7 @@ function RadarIcon() {
         x={68}
         y={36}
         textAnchor="middle"
-        fill="#e74c3c"
+        fill="#f85149"
         fontSize={7}
         fontWeight={600}
       >
@@ -325,8 +325,8 @@ function SyncIcon() {
           cx={p.x}
           cy={p.y}
           r={10}
-          fill={`rgba(231,76,60,${0.15 + i * 0.05})`}
-          stroke="#e74c3c"
+          fill={`rgba(248,81,73,${0.15 + i * 0.05})`}
+          stroke="#f85149"
           strokeWidth={1.5}
           animate={{
             cx: [p.x, 44, p.x],
@@ -345,7 +345,7 @@ function SyncIcon() {
         cy={44}
         r={0}
         fill="none"
-        stroke="#9b59b6"
+        stroke="#8957E5"
         strokeWidth={1.5}
         animate={{ r: [0, 18], opacity: [0.8, 0] }}
         transition={{ duration: 1.5, delay: 1.5, repeat: Infinity }}

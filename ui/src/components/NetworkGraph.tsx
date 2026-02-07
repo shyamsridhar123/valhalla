@@ -118,8 +118,8 @@ export function NetworkGraph() {
 
     // Node gradient
     const gradientColors = [
-      { id: 'grad-default', inner: '#4a9eff', outer: '#2a5e9f' },
-      { id: 'grad-selected', inner: '#ff6b6b', outer: '#9f3a3a' },
+      { id: 'grad-default', inner: '#38BDF8', outer: '#0EA5E9' },
+      { id: 'grad-selected', inner: '#FACC15', outer: '#EAB308' },
     ];
     for (const gc of gradientColors) {
       const grad = defs.append('radialGradient').attr('id', gc.id);

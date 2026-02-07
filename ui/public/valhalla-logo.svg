@@ -1,0 +1,46 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="paint0_linear" x1="128" y1="40" x2="128" y2="216" gradientUnits="userSpaceOnUse">
+<stop stop-color="#38BDF8"/>
+<stop offset="1" stop-color="#0EA5E9"/>
+</linearGradient>
+<linearGradient id="paint1_linear" x1="128" y1="100" x2="128" y2="156" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FACC15"/>
+<stop offset="1" stop-color="#EAB308"/>
+</linearGradient>
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+<feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+<feMerge>
+<feMergeNode in="coloredBlur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+</defs>
+
+<path d="M128 16L224.96 72V184L128 240L31.04 184V72L128 16Z" fill="#0F172A" stroke="#1E293B" stroke-width="4"/>
+
+<g filter="url(#glow)">
+<path d="M128 80V176" stroke="url(#paint0_linear)" stroke-width="8" stroke-linecap="round"/>
+
+<path d="M128 80L96 56" stroke="url(#paint0_linear)" stroke-width="6" stroke-linecap="round"/>
+<path d="M128 80L160 56" stroke="url(#paint0_linear)" stroke-width="6" stroke-linecap="round"/>
+<path d="M128 56V40" stroke="url(#paint0_linear)" stroke-width="6" stroke-linecap="round"/>
+
+<path d="M128 176L96 200" stroke="url(#paint0_linear)" stroke-width="6" stroke-linecap="round"/>
+<path d="M128 176L160 200" stroke="url(#paint0_linear)" stroke-width="6" stroke-linecap="round"/>
+<path d="M128 200V216" stroke="url(#paint0_linear)" stroke-width="6" stroke-linecap="round"/>
+
+<circle cx="96" cy="56" r="6" fill="#38BDF8"/>
+<circle cx="160" cy="56" r="6" fill="#38BDF8"/>
+<circle cx="128" cy="40" r="6" fill="#38BDF8"/>
+<circle cx="96" cy="200" r="6" fill="#38BDF8"/>
+<circle cx="160" cy="200" r="6" fill="#38BDF8"/>
+<circle cx="128" cy="216" r="6" fill="#38BDF8"/>
+</g>
+
+<path d="M128 112L112 136H144L128 112Z" fill="url(#paint1_linear)"/>
+<path d="M112 136L128 156L144 136" stroke="url(#paint1_linear)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+<path d="M80 128H176" stroke="#64748B" stroke-width="2" stroke-dasharray="4 6" opacity="0.5"/>
+
+</svg>
