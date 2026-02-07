@@ -66,9 +66,6 @@ export function ScenarioViz({
         {scenario === 'content-sharing' && (
           <ContentSharingViz step={step} />
         )}
-        {scenario === 'trust-web' && (
-          <TrustWebViz step={step} />
-        )}
         {scenario === 'service-discovery' && (
           <ServiceDiscoveryViz step={step} />
         )}
@@ -484,125 +481,6 @@ function ContentSharingViz({
           <circle cx={260} cy={230} r={16} fill="#2ecc7130" stroke="#2ecc71" strokeWidth={1.5} />
           <text x={260} y={235} textAnchor="middle" fill="#2ecc71" fontSize={16} fontWeight={700}>✓</text>
           <text x={260} y={260} textAnchor="middle" fill={colors.textDim} fontSize={10}>Signature verified</text>
-        </m.g>
-      )}
-    </svg>
-  );
-}
-
-// ─── Trust Web ─────────────────────────────────────────────────────────
-
-function TrustWebViz({
-  step,
-}: {
-  step: number;
-}) {
-  // Steps: 0=building, 1=Alice→Bob, 2=Bob→Carol, 3-5=trust scores, 6=decay
-  const showAliceBob = step >= 2;
-  const showBobCarol = step >= 3;
-  const showScores = step >= 4;
-  const showTransitive = step >= 5;
-
-  const nodes = [
-    { x: 250, y: 80, name: 'Alice', color: '#e67e22' },
-    { x: 120, y: 260, name: 'Bob', color: '#3498db' },
-    { x: 380, y: 260, name: 'Carol', color: '#2ecc71' },
-  ];
-
-  return (
-    <svg width="500" height="380" viewBox="0 0 500 380" style={{ maxWidth: '100%', maxHeight: '100%' }}>
-      {/* Alice → Bob attestation */}
-      {showAliceBob && (
-        <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          <m.line
-            x1={nodes[0].x}
-            y1={nodes[0].y + 35}
-            x2={nodes[1].x + 25}
-            y2={nodes[1].y - 25}
-            stroke="#e67e22"
-            strokeWidth={2}
-            strokeDasharray="8,4"
-            animate={{ strokeDashoffset: [0, -24] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          />
-          {showScores && (
-            <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <rect x={152} y={152} width={50} height={20} rx={10} fill="#e67e22" fillOpacity={0.2} />
-              <text x={177} y={166} textAnchor="middle" fill="#e67e22" fontSize={11} fontWeight={700}>0.90</text>
-            </m.g>
-          )}
-        </m.g>
-      )}
-
-      {/* Bob → Carol attestation */}
-      {showBobCarol && (
-        <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          <m.line
-            x1={nodes[1].x + 35}
-            y1={nodes[1].y}
-            x2={nodes[2].x - 35}
-            y2={nodes[2].y}
-            stroke="#3498db"
-            strokeWidth={2}
-            strokeDasharray="8,4"
-            animate={{ strokeDashoffset: [0, -24] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          />
-          {showScores && (
-            <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <rect x={225} y={248} width={50} height={20} rx={10} fill="#3498db" fillOpacity={0.2} />
-              <text x={250} y={262} textAnchor="middle" fill="#3498db" fontSize={11} fontWeight={700}>0.85</text>
-            </m.g>
-          )}
-        </m.g>
-      )}
-
-      {/* Transitive: Alice → Carol */}
-      {showTransitive && (
-        <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
-          <m.line
-            x1={nodes[0].x + 25}
-            y1={nodes[0].y + 30}
-            x2={nodes[2].x - 20}
-            y2={nodes[2].y - 25}
-            stroke="#9b59b6"
-            strokeWidth={1.5}
-            strokeDasharray="4,6"
-            strokeOpacity={0.5}
-            animate={{ strokeDashoffset: [0, -20] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          />
-          <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-            <rect x={320} y={155} width={68} height={20} rx={10} fill="#9b59b6" fillOpacity={0.2} />
-            <text x={354} y={169} textAnchor="middle" fill="#9b59b6" fontSize={10} fontWeight={600}>0.77 (trans.)</text>
-          </m.g>
-        </m.g>
-      )}
-
-      {/* Nodes */}
-      {nodes.map((node, i) => (
-        <m.g
-          key={node.name}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', delay: i * 0.15 }}
-        >
-          <circle cx={node.x} cy={node.y} r={32} fill={`${node.color}15`} stroke={node.color} strokeWidth={2} />
-          <text x={node.x} y={node.y - 4} textAnchor="middle" fill={node.color} fontSize={20} fontWeight={800}>
-            {node.name[0]}
-          </text>
-          <text x={node.x} y={node.y + 14} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={600} fontFamily={fonts.ui}>
-            {node.name}
-          </text>
-        </m.g>
-      ))}
-
-      {/* Legend */}
-      {showTransitive && (
-        <m.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-          <text x={250} y={340} textAnchor="middle" fill={colors.textDim} fontSize={10} fontFamily={fonts.mono}>
-            Trust decays transitively: 0.9 × 0.85 = 0.77
-          </text>
         </m.g>
       )}
     </svg>

@@ -207,64 +207,6 @@ function ContentIcon() {
   );
 }
 
-function TrustIcon() {
-  const pts = [
-    { x: 44, y: 18 },
-    { x: 22, y: 58 },
-    { x: 66, y: 58 },
-  ];
-  const labels = ['A', 'B', 'C'];
-  return (
-    <svg width="88" height="88" viewBox="0 0 88 88">
-      {[[0, 1], [1, 2], [0, 2]].map(([from, to], i) => (
-        <m.line
-          key={i}
-          x1={pts[from].x}
-          y1={pts[from].y}
-          x2={pts[to].x}
-          y2={pts[to].y}
-          stroke="#e67e22"
-          strokeWidth={1}
-          strokeDasharray="4,3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.6, 0.3], strokeDashoffset: [0, -14] }}
-          transition={{
-            duration: 2.5,
-            delay: i * 0.4,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-      ))}
-      {pts.map((p, i) => (
-        <g key={i}>
-          <m.circle
-            cx={p.x}
-            cy={p.y}
-            r={12}
-            fill="rgba(230,126,34,0.15)"
-            stroke="#e67e22"
-            strokeWidth={1.5}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: i * 0.2, type: 'spring' }}
-          />
-          <text
-            x={p.x}
-            y={p.y + 4}
-            textAnchor="middle"
-            fill="#e67e22"
-            fontSize={10}
-            fontWeight={700}
-          >
-            {labels[i]}
-          </text>
-        </g>
-      ))}
-    </svg>
-  );
-}
-
 function RadarIcon() {
   return (
     <svg width="88" height="88" viewBox="0 0 88 88">
@@ -358,7 +300,6 @@ const SCENARIO_ICONS: Record<string, () => ReactNode> = {
   'mesh-formation': MeshIcon,
   'encrypted-chat': LockIcon,
   'content-sharing': ContentIcon,
-  'trust-web': TrustIcon,
   'service-discovery': RadarIcon,
   'state-sync': SyncIcon,
 };

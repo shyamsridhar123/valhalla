@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useValhallaStore } from '../store/useValhallaStore';
-import type { NodeInfo, PeerLink, ScenarioInfo, StackEvent, TrustInfo, FullNodeState } from '../types/api';
+import type { NodeInfo, PeerLink, ScenarioInfo, StackEvent, FullNodeState } from '../types/api';
 
 const API_BASE = 'http://localhost:8080';
 const WS_URL = 'ws://localhost:8080/api/events';
@@ -12,7 +12,6 @@ export function useValhalla() {
   const setNodes = useValhallaStore((s) => s.setNodes);
   const setPeers = useValhallaStore((s) => s.setPeers);
   const setScenarios = useValhallaStore((s) => s.setScenarios);
-  const setAttestations = useValhallaStore((s) => s.setAttestations);
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
@@ -76,16 +75,6 @@ export function useValhalla() {
     }
   }, [setScenarios]);
 
-  const fetchTrust = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/trust`);
-      const data: TrustInfo[] = await res.json();
-      setAttestations(data);
-    } catch {
-      // API not available yet
-    }
-  }, [setAttestations]);
-
   const runScenario = useCallback(async (name: string) => {
     try {
       await fetch(`${API_BASE}/api/scenarios/run`, {
@@ -104,17 +93,6 @@ export function useValhalla() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ src, dst, message }),
-      });
-      return res.json();
-    } catch { return null; }
-  }, []);
-
-  const createTrust = useCallback(async (src: number, dst: number, claim: string, confidence: number) => {
-    try {
-      const res = await fetch(`${API_BASE}/api/interactive/trust`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ src, dst, claim, confidence }),
       });
       return res.json();
     } catch { return null; }
@@ -174,16 +152,14 @@ export function useValhalla() {
     fetchNodes();
     fetchPeers();
     fetchScenarios();
-    fetchTrust();
 
     const interval = setInterval(() => {
       fetchNodes();
       fetchPeers();
-      fetchTrust();
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [fetchNodes, fetchPeers, fetchScenarios, fetchTrust]);
+  }, [fetchNodes, fetchPeers, fetchScenarios]);
 
-  return { fetchNodes, fetchPeers, fetchTrust, runScenario, sendMessage, createTrust, publishContent, setCRDT, disconnectPair, connectPair, fetchNodeState };
+  return { fetchNodes, fetchPeers, runScenario, sendMessage, publishContent, setCRDT, disconnectPair, connectPair, fetchNodeState };
 }

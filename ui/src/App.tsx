@@ -4,18 +4,16 @@ import { useValhallaStore } from './store/useValhallaStore';
 import { NetworkGraph } from './components/NetworkGraph';
 import { StackView } from './components/StackView';
 import { DemoRunner } from './components/DemoRunner';
-import { TrustGraph } from './components/TrustGraph';
 import { EventLog } from './components/EventLog';
 import { colors } from './theme';
 import './App.css';
 
-type Tab = 'network' | 'stack' | 'demos' | 'trust';
+type Tab = 'network' | 'stack' | 'demos';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'network', label: 'Network' },
   { id: 'stack', label: 'Stack' },
   { id: 'demos', label: 'Demos' },
-  { id: 'trust', label: 'Trust' },
 ];
 
 const tabContentVariants = {
@@ -30,7 +28,6 @@ function App() {
   const setActiveTab = useValhallaStore((s) => s.setActiveTab);
   const events = useValhallaStore((s) => s.events);
   const nodes = useValhallaStore((s) => s.nodes);
-  const attestations = useValhallaStore((s) => s.attestations);
 
   const lastLayerEvent = [...events].reverse().find((e) => e.layer !== 'demo');
 
@@ -109,7 +106,6 @@ function App() {
             {activeTab === 'network' && <NetworkGraph />}
             {activeTab === 'stack' && <StackView activeLayer={lastLayerEvent?.layer} />}
             {activeTab === 'demos' && <DemoRunner />}
-            {activeTab === 'trust' && <TrustGraph attestations={attestations} />}
           </m.div>
         </AnimatePresence>
 

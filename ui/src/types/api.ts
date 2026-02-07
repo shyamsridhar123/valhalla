@@ -25,13 +25,6 @@ export interface ScenarioInfo {
   description: string;
 }
 
-export interface TrustInfo {
-  attester: string;
-  subject: string;
-  claim: string;
-  confidence: number;
-}
-
 export interface FullNodeState {
   node_id: string;
   short_id: string;
@@ -40,7 +33,6 @@ export interface FullNodeState {
   peers: { short_id: string; node_id: string }[];
   services: string[];
   crdt_state: Record<string, string>;
-  trust_out: { attester: string; subject: string; claim: string; confidence: number }[];
   cache_size: number;
   pubsub_topics: string[];
 }
