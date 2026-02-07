@@ -2,14 +2,16 @@
 
 ## Goals
 
-Build a working demonstration of the Valhalla stack that:
+Build a working demonstration of the Valhalla overlay stack that:
 
-1. **Runs multiple nodes** on a single machine (or across machines) communicating over the new stack
-2. **Demonstrates the full layer traversal** -- messages flowing through all six Valhalla layers
-3. **Provides a web UI** that visualizes the stack in real-time
-4. **Includes demo scenarios** that showcase key advantages over the traditional internet
+1. **Runs multiple nodes** in a single process (with in-memory connections) or across processes (with real TCP)
+2. **Demonstrates the full layer traversal** -- data structures flowing through all six Valhalla layers with real cryptographic operations
+3. **Provides a web UI** that visualizes the overlay stack in real-time
+4. **Includes demo scenarios** that showcase the architectural advantages of overlay networking with cryptographic identity
 
 The PoC is not production-grade. It prioritizes clarity and demonstrability over performance and scale.
+
+> **Note on the demo network:** In `--demo` mode, all nodes run as goroutines within a single process and communicate via direct function calls (no TCP). This means no actual network traffic flows between nodes. The layered processing, cryptographic operations, and routing logic all execute for real — but the transport between nodes is an in-memory shortcut. See [06-recommendations.md](./06-recommendations.md) for the path toward real multi-process networking.
 
 ---
 
@@ -371,7 +373,14 @@ Show the wire-level view: an observer on the network sees only encrypted noise.
 
 ## Multi-Node Simulation
 
-For the PoC, we run multiple nodes in a single process using goroutines:
+For the PoC, we run multiple nodes in a single process using goroutines. In the current implementation, the demo network uses **in-memory connections** — nodes reference each other directly via Go pointers rather than communicating over TCP. This means:
+
+- No actual TCP connections between nodes
+- No Bifrost frames on the wire
+- No real network latency (though it can be simulated)
+- RPC calls are dispatched directly to the target node's handler
+
+This is an intentional simplification for demo reliability. The layered architecture, cryptographic operations (Ed25519 signing, Noise handshakes, content hashing), and routing logic all execute normally — only the transport between nodes is short-circuited.
 
 ```go
 type Network struct {

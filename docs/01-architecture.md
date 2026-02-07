@@ -2,35 +2,53 @@
 
 ## Stack Overview
 
-The Valhalla stack replaces OSI layers 2-7 with six new layers designed around cryptographic identity, content addressing, and mandatory security.
+Valhalla implements a 6-layer overlay protocol stack that runs on top of existing TCP/IP infrastructure. Each layer is an application-level abstraction implemented in Go, handling a specific concern (framing, routing, encryption, content, trust, application services).
+
+The layer numbering (1-6) is an **internal Valhalla convention** inspired by the OSI model's separation of concerns. It does not correspond to actual OSI layer numbers. In OSI terms, the entire Valhalla stack operates within Layer 7 (Application), riding on the OS kernel's TCP/IP implementation for actual network I/O.
 
 ```
-    OSI Model                                       Valhalla Stack
-   ──────────                                      ──────────────
+    Valhalla Overlay Stack                    Conceptual Role
+   ──────────────────────                    ────────────────
 
-   ┌────────────────────┐                          ┌────────────────────────────────────────────┐
-   │ 7  Application      │  ─────────────────────► │ 6  Realm (App Mesh)                        │
-   │ 6  Presentation     │                          │    P2P services, CRDT state sync            │
-   ├────────────────────┤                          ├────────────────────────────────────────────┤
-   │ 5  Session          │  ─────────────────────► │ 5  Rune (Trust)                            │
-   │                      │                          │    Capabilities, reputation, attestation    │
-   ├────────────────────┤                          ├────────────────────────────────────────────┤
-   │ 4  Transport        │  ─────────────────────► │ 4  Saga (Intent)                           │
-   │                      │                          │    Content addressing, service discovery    │
-   ├────────────────────┤                          ├────────────────────────────────────────────┤
-   │ 3  Network          │  ─────────────────────► │ 3  Veil (Flow)                             │
-   │                      │                          │    Encrypted streams, multiplexing         │
-   ├────────────────────┤                          ├────────────────────────────────────────────┤
-   │ 2  Data Link        │  ─────────────────────► │ 2  Yggdrasil (Mesh)                        │
-   │                      │                          │    Crypto identity, DHT routing            │
-   ├────────────────────┤                          ├────────────────────────────────────────────┤
-   │ 1  Physical         │                          │ 1  Bifrost (Bridge)                        │
-   └────────────────────┘                          │    Framing & tunneling over existing nets   │
-                                                    ├────────────────────────────────────────────┤
-                                                    │ 0  Physical                                │
-                                                    │    Unchanged: wires, fiber, radio           │
-                                                    └────────────────────────────────────────────┘
+   ┌────────────────────────────────────────────┐
+   │ 6  Realm (App Mesh)                        │  Like OSI L7: application services
+   │    P2P services, CRDT state sync            │
+   ├────────────────────────────────────────────┤
+   │ 5  Rune (Trust)                            │  Like OSI L5-6: session trust, presentation
+   │    Capabilities, reputation, attestation    │
+   ├────────────────────────────────────────────┤
+   │ 4  Saga (Intent)                           │  Like DNS + HTTP semantics: content + discovery
+   │    Content addressing, service discovery    │
+   ├────────────────────────────────────────────┤
+   │ 3  Veil (Flow)                             │  Like TLS + stream mux: encryption + channels
+   │    Encrypted streams, multiplexing         │
+   ├────────────────────────────────────────────┤
+   │ 2  Yggdrasil (Mesh)                        │  Like overlay routing: identity + forwarding
+   │    Crypto identity, DHT routing            │
+   ├────────────────────────────────────────────┤
+   │ 1  Bifrost (Bridge)                        │  Framing protocol over host transports
+   │    Framing & tunneling over existing nets   │
+   ╞════════════════════════════════════════════╡
+   │    Host OS TCP/IP Stack                    │  Actual OSI L1-L4
+   │    TCP, UDP, WebSocket (unchanged)          │  (kernel-managed, not touched by Valhalla)
+   └────────────────────────────────────────────┘
 ```
+
+### What "Layered" Means Here
+
+Each Valhalla layer is a Go package that processes data structures (not raw network packets). When data flows through the stack:
+
+1. Upper layers create typed Go structs (RPCRequest, ContentEnvelope, etc.)
+2. Each layer transforms or wraps the data as it passes through
+3. At the bottom, Bifrost serializes the final structure to bytes
+4. Those bytes are written to a standard `net.Conn` (TCP/WebSocket)
+5. The OS kernel handles actual packet framing, IP routing, and physical transmission
+
+This is the same architectural pattern used by:
+- **libp2p**: modular protocol stack with identity, routing, encryption, multiplexing
+- **Tor**: layered encryption over TCP connections
+- **CJDNS/Yggdrasil Network**: overlay routing with cryptographic addresses
+- **QUIC**: encrypted transport protocol running over UDP
 
 Each layer has a Norse-inspired codename reflecting its role:
 - **Bifrost** (the rainbow bridge) -- bridges between the old internet and the new
@@ -44,9 +62,11 @@ Each layer has a Norse-inspired codename reflecting its role:
 
 ## Layer 1: Bifrost (Bridge)
 
-**Purpose:** Tunnel Valhalla traffic over existing infrastructure.
+**Purpose:** Provide a framing protocol over existing host transports.
 
-Since we cannot replace physical networks, Bifrost provides framing and multiplexing over whatever transport is available -- TCP, UDP, QUIC, WebSocket, Bluetooth, or a USB cable.
+Bifrost is the lowest layer of the Valhalla overlay. It does **not** interact with physical network interfaces, Ethernet frames, or MAC addresses. Instead, it defines a simple binary framing protocol that rides on top of existing transport connections (TCP, WebSocket, UDP) provided by the OS.
+
+Think of it as Valhalla's equivalent of length-prefixed message framing — the same thing that protocols like gRPC, HTTP/2, or AMQP do over TCP.
 
 ### Design
 
@@ -101,7 +121,7 @@ Borrowing from libp2p's multiaddr concept, Bifrost uses **PathAddr** -- composab
 
 **Purpose:** Cryptographic identity, peer discovery, and overlay routing.
 
-This is the most radical departure from traditional networking. There are no IP addresses in the Valhalla address space. Every node is identified by a **NodeID** derived from its cryptographic keypair.
+Yggdrasil is the overlay network layer. It does **not** parse IP headers or interact with the kernel routing table. Instead, it maintains its own address space (NodeIDs derived from Ed25519 public keys) and its own routing logic (Kademlia DHT) within the application. Messages are routed by NodeID through the overlay's peer-to-peer connections, which themselves ride on TCP/WebSocket.
 
 ### Identity
 
@@ -183,9 +203,9 @@ Only the key holder can update their location. Observers can cache and relay the
 
 ## Layer 3: Veil (Flow)
 
-**Purpose:** Encrypted, multiplexed, reliable communication streams.
+**Purpose:** Encrypted, multiplexed communication streams within the overlay.
 
-Veil replaces TCP + TLS with a single layer that is always encrypted and supports multiple concurrent streams over a single connection.
+Veil handles encryption and stream multiplexing. It does **not** replace TCP or parse TCP headers. Instead, it wraps existing `net.Conn` connections with a Noise protocol handshake and then multiplexes encrypted streams over that connection. This is conceptually similar to what TLS + HTTP/2 do, but with mutual authentication and no CA dependency.
 
 ### Connection Establishment
 
@@ -270,9 +290,9 @@ Each stream has independent congestion control using a BBR-inspired algorithm. S
 
 ## Layer 4: Saga (Intent)
 
-**Purpose:** Content addressing, service discovery, and structured data exchange.
+**Purpose:** Content addressing, service discovery, and structured data exchange within the overlay.
 
-Saga replaces DNS, HTTP semantics, and serialization with a unified intent-based system. Instead of "connect me to server X at address Y," you express "I want content Z" or "I need service W."
+Saga provides content-addressed storage and intent-based service discovery. Instead of connecting to a specific server by IP, nodes express what content or service they need, and the overlay resolves it. This is conceptually similar to what IPFS does for content addressing or what DNS + HTTP do for service discovery — but unified into one layer with cryptographic integrity built in.
 
 ### Content Addressing
 
@@ -364,9 +384,9 @@ Schemas are themselves content-addressed. When two nodes communicate, they excha
 
 ## Layer 5: Rune (Trust)
 
-**Purpose:** Decentralized trust, capability-based access control, and reputation.
+**Purpose:** Decentralized trust, capability-based access control, and reputation within the overlay.
 
-Rune replaces the Certificate Authority hierarchy with a web-of-trust model and capability tokens.
+Rune provides a web-of-trust model and capability tokens as an alternative to the Certificate Authority hierarchy. Nodes vouch for each other through signed attestations, and access control uses self-contained, cryptographically verifiable capability tokens. This is purely an application-level trust framework — it does not interact with system-level certificate stores or TLS infrastructure.
 
 ### Identity Attestation
 
@@ -579,6 +599,46 @@ Bob receives:
 6. [Saga]      Receive ContentEnvelope, verify CID matches hash, verify signature
 7. [Realm]     Return content to app -- doesn't matter who served it
 ```
+
+---
+
+## Technical Reality: Overlay vs. Kernel Stack
+
+It's important to understand what this architecture is and is not.
+
+### What Actually Happens on the Wire
+
+When Alice sends a message to Bob through Valhalla, the actual network traffic is:
+
+1. A **standard TCP connection** between two IP addresses (or a WebSocket connection)
+2. Over that TCP stream, **Bifrost frames** (7-byte header + payload) carry the overlay protocol data
+3. Within those frames, Veil encryption wraps the actual message content
+4. The OS kernel handles all real L1-L4 concerns: Ethernet framing, IP routing, TCP flow control, congestion management
+
+An observer with a packet capture tool would see: **ordinary TCP traffic** between two IP addresses. The Valhalla framing, routing, and encryption are visible only within the TCP payload.
+
+### What This Means
+
+- **Bifrost does not touch Ethernet frames** or MAC addresses. It writes bytes to a `net.Conn`.
+- **Yggdrasil does not parse IP headers** or manipulate the kernel routing table. It maintains an overlay routing table in Go memory.
+- **Veil does not replace TCP**. It adds encryption and multiplexing *on top of* a TCP connection.
+- **The TTL field in Yggdrasil messages** is an overlay hop counter, not the IP TTL field.
+- **NodeIDs are overlay addresses**, not IP addresses. The mapping from NodeID to actual IP:port is maintained by the DHT.
+
+### The Demo Network
+
+In the PoC's `--demo` mode, the architecture is further simplified: nodes communicate via **direct Go function calls in the same process**, bypassing even the TCP transport. This makes demos deterministic and fast but means no actual network I/O occurs between nodes.
+
+### Where Real Protocol Work Happens
+
+Despite being an overlay, the following operations are genuine and functional:
+- **Ed25519 key generation and signing** — real cryptographic operations
+- **Noise XX handshakes** — real authenticated key exchange (via `flynn/noise`)
+- **ChaCha20-Poly1305 encryption** — real AEAD encryption of all overlay traffic
+- **SHA-256 content addressing** — real content-addressed storage with integrity verification
+- **Kademlia DHT routing** — real XOR-distance-based peer lookup
+
+The cryptography is not simulated. The overlay routing is not simulated. The layered architecture is functional. What's missing is the kernel-level integration that would make this a true replacement for TCP/IP rather than a layer on top of it.
 
 ---
 

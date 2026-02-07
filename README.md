@@ -1,47 +1,58 @@
 <p align="center">
   <strong>⚡ Valhalla</strong><br>
-  <em>A post-IP networking stack built from scratch in Go</em>
+  <em>An overlay network protocol stack built in Go</em>
 </p>
 
 ---
 
-Valhalla replaces OSI layers 2–7 with six new layers designed around cryptographic identity, content addressing, and mandatory encryption. No DNS. No CAs. No IP addresses. Every node is identified by its Ed25519 keypair.
+Valhalla is a **6-layer overlay network stack** that runs on top of existing TCP/IP infrastructure. It implements cryptographic identity, content addressing, and mandatory encryption as an application-level protocol suite — similar in approach to [libp2p](https://libp2p.io/), [Yggdrasil Network](https://yggdrasil-network.github.io/), or [Tailscale](https://tailscale.com/).
+
+Every node is identified by its Ed25519 keypair (not IP addresses). There is no DNS or Certificate Authority dependency. All communication is encrypted by default.
+
+> **Important:** Valhalla does not replace the OS TCP/IP stack. It builds a new protocol stack *above* it. The six Valhalla layers are application-level abstractions that handle identity, routing, encryption, content addressing, trust, and application services within the overlay. The underlying OS kernel still handles actual L1–L4 networking (Ethernet, IP, TCP). Think of it as a "network stack within the application layer" — the same architectural pattern used by Tor, I2P, and libp2p.
 
 ```
-    Traditional OSI                                   Valhalla Stack
-   ┌─────────────────┐                    ┌──────────────────────────────────────┐
-   │ 7  Application  │  ───────────────►  │ 6  Realm       P2P RPC, Pub/Sub,     │
-   │ 6  Presentation │                    │                CRDTs                 │
-   ├─────────────────┤                    ├──────────────────────────────────────┤
-   │ 5  Session      │  ───────────────►  │ 5  Rune        Web-of-trust,         │
-   │                 │                    │                capabilities          │
-   ├─────────────────┤                    ├──────────────────────────────────────┤
-   │ 4  Transport    │  ───────────────►  │ 4  Saga        Content addressing,   │
-   │                 │                    │                intent discovery      │
-   ├─────────────────┤                    ├──────────────────────────────────────┤
-   │ 3  Network      │  ───────────────►  │ 3  Veil        Always-on encryption, │
-   │                 │                    │                stream multiplexing   │
-   ├─────────────────┤                    ├──────────────────────────────────────┤
-   │ 2  Data Link    │  ───────────────►  │ 2  Yggdrasil   Kademlia DHT,         │
-   │                 │                    │                mesh routing          │
-   ├─────────────────┤                    ├──────────────────────────────────────┤
-   │ 1  Physical     │                    │ 1  Bifrost     Framing over          │
-   └─────────────────┘                    │                TCP / WS / UDP        │
-                                          ├──────────────────────────────────────┤
-                                          │ 0  Physical    Unchanged             │
-                                          └──────────────────────────────────────┘
+                              Valhalla Overlay Stack
+                    ┌──────────────────────────────────────┐
+                    │ 6  Realm       P2P RPC, Pub/Sub,     │
+                    │                CRDTs                 │
+                    ├──────────────────────────────────────┤
+                    │ 5  Rune        Web-of-trust,         │
+                    │                capabilities          │
+                    ├──────────────────────────────────────┤
+                    │ 4  Saga        Content addressing,   │
+                    │                intent discovery      │
+                    ├──────────────────────────────────────┤
+                    │ 3  Veil        Always-on encryption, │
+                    │                stream multiplexing   │
+                    ├──────────────────────────────────────┤
+                    │ 2  Yggdrasil   Kademlia DHT,         │
+                    │                mesh routing          │
+                    ├──────────────────────────────────────┤
+                    │ 1  Bifrost     Framing over          │
+                    │                TCP / WS / UDP        │
+                    ╞══════════════════════════════════════╡
+                    │    OS TCP/IP   Actual L1-L4          │
+                    │    Stack       (unchanged)           │
+                    └──────────────────────────────────────┘
 ```
 
 ## Stack Layers
 
-| # | Layer | Codename | Purpose |
-|---|-------|----------|---------|
+Each layer is an application-level abstraction. The numbering is internal to Valhalla and does not correspond to OSI layer numbers (e.g., Bifrost is labeled "Layer 1" but operates above the OS transport layer, not at the physical layer).
+
+| # | Layer | Codename | What It Does |
+|---|-------|----------|--------------|
 | 6 | Application | **Realm** | P2P RPC, topic-based pub/sub, LWW-Register CRDTs |
 | 5 | Trust | **Rune** | Decentralized trust via signed attestations and capability tokens |
 | 4 | Content | **Saga** | Content-addressed data (SHA-256 CIDs), intent-based service discovery |
 | 3 | Encryption | **Veil** | Noise protocol handshake, ChaCha20-Poly1305, stream multiplexing |
 | 2 | Mesh | **Yggdrasil** | Ed25519 identity, Kademlia k-bucket routing, DHT peer discovery |
 | 1 | Bridge | **Bifrost** | Frames and tunnels over existing transports (TCP, WebSocket, UDP) |
+
+### Relationship to OSI
+
+Valhalla's layers are **conceptually inspired** by the OSI model but do not replace it. In OSI terms, the entire Valhalla stack runs at Layer 7 (Application). Within that, Valhalla decomposes concerns that traditional networking spreads across layers — identity, encryption, routing, content addressing — into its own layered abstraction. This is the same pattern used by libp2p, Tor, and CJDNS.
 
 ## Quick Start
 
@@ -65,12 +76,12 @@ Open **http://localhost:8080** — the UI is embedded in the binary. The demo sh
 ```
 cmd/valhalla/                CLI entry point + embedded UI (go:embed)
 internal/
-├── bifrost/                 Layer 1 — Frame encoding, TCP/WS transports
-├── yggdrasil/               Layer 2 — Identity, peer table, DHT, routing
-├── veil/                    Layer 3 — Noise handshake, encryption, streams
-├── saga/                    Layer 4 — Content addressing, intents, cache
-├── rune/                    Layer 5 — Attestations, capabilities, reputation
-├── realm/                   Layer 6 — RPC, pub/sub, CRDT sync
+├── bifrost/                 Bridge — Frame encoding, TCP/WS transports
+├── yggdrasil/               Mesh — Identity, peer table, DHT, routing
+├── veil/                    Encryption — Noise handshake, encrypted streams
+├── saga/                    Content — Content addressing, intents, cache
+├── rune/                    Trust — Attestations, capabilities, reputation
+├── realm/                   Application — RPC, pub/sub, CRDT sync
 ├── api/                     REST API + WebSocket event streaming
 ├── demo/                    Multi-node orchestrator + demo scenarios
 ├── node/                    Full-stack node assembly
@@ -142,9 +153,25 @@ Detailed design documents are in [`docs/`](docs/):
 - [Implementation Plan](docs/03-implementation-plan.md) — Phased build plan
 - [Tech Decisions](docs/04-tech-decision.md) — Why Go, why these dependencies
 
+## How It Works
+
+In the current PoC, all Valhalla nodes run as goroutines within a single process. The demo mode uses in-memory connections between nodes (no actual TCP traffic between them). This makes the demo deterministic and easy to run, but it means the "network" is simulated within the application.
+
+When running in non-demo mode, nodes communicate over real TCP/WebSocket connections — but these ride on the OS TCP/IP stack. Valhalla adds its own framing (Bifrost), routing (Yggdrasil), encryption (Veil), and higher-level services on top.
+
+## Comparable Projects
+
+| Project | Similarity | Key Difference |
+|---------|-----------|----------------|
+| [libp2p](https://libp2p.io/) | Modular network stack, crypto identity, DHT | Production-grade, IPFS ecosystem |
+| [Yggdrasil Network](https://yggdrasil-network.github.io/) | Overlay mesh, crypto addressing, DHT routing | Uses TUN interface for real IP replacement |
+| [CJDNS](https://github.com/cjdelisle/cjdns) | Crypto identity as address, mesh routing | Operates at Layer 3 via TUN device |
+| [Tailscale](https://tailscale.com/) | WireGuard overlay, crypto identity | Production VPN, centralized coordination |
+| [I2P](https://geti2p.net/) | Layered overlay, encrypted transport | Focus on anonymity, garlic routing |
+
 ## Disclaimer
 
-> **This is an experimental proof-of-concept.** It is not production-ready, not audited, and not suitable for any security-critical use. The cryptographic implementations have not been reviewed. Use at your own risk.
+> **This is an experimental proof-of-concept.** It demonstrates overlay network architecture concepts through a working simulation. It is not production-ready, not audited, and not suitable for any security-critical use. The cryptographic implementations have not been reviewed. The demo network runs in-memory within a single process. Use at your own risk.
 
 ## License
 

@@ -4,9 +4,9 @@
 
 The internet's core architecture -- the OSI/TCP-IP model -- was designed in the 1970s-80s for a world of stationary mainframes connected by dedicated links. Fifty years later, we have billions of mobile devices, pervasive encryption needs, content delivery at planetary scale, and an entire economy running on a stack that conflates identity with location, treats security as an afterthought, and routes to machines instead of data.
 
-We cannot change the physical layer. Fiber, copper, and radio are what they are. But everything above the wire -- from framing to applications -- deserves a ground-up rethink.
+We cannot change the physical layer. Fiber, copper, and radio are what they are. But the abstractions above the wire -- identity, addressing, encryption, content routing, trust -- deserve a ground-up rethink.
 
-**Project Valhalla** is that rethink: a new network stack designed for the world as it is, not the world of 1983.
+**Project Valhalla** is that rethink: an overlay network protocol stack that demonstrates what networking could look like if we designed it for the world as it is, not the world of 1983. It runs **on top of** existing TCP/IP infrastructure, proving that better abstractions are possible without replacing the plumbing.
 
 ---
 
@@ -96,12 +96,20 @@ Communication produces signed, verifiable artifacts (logs, content blocks) that 
 
 ---
 
+## What Valhalla IS
+
+- **An overlay network protocol stack.** Like libp2p, Tor, or Tailscale, Valhalla builds a new set of abstractions on top of existing TCP/IP. It does not replace the kernel networking stack — it runs within the application layer and provides its own layered architecture for identity, routing, encryption, content addressing, trust, and application services.
+- **A proof-of-concept.** Working code demonstrates each architectural concept. Data structures flow through real layer implementations with real cryptographic operations (Ed25519 signing, Noise handshakes, ChaCha20 encryption). However, the demo network currently runs in-memory within a single process.
+- **An argument by construction.** Rather than writing a whitepaper, Valhalla shows what a post-IP addressing model looks like by building one.
+- **An overlay, not a replacement.** It runs *over* existing IP infrastructure, the same way QUIC runs over UDP or Tor runs over TCP. Proving the architecture works at the overlay level is a prerequisite to deeper integration.
+
 ## What Valhalla Is NOT
 
+- **Not a kernel networking stack.** There are no raw sockets, no eBPF programs, no TUN/TAP interfaces, no packet interception. All networking uses Go's standard `net` package over TCP/WebSocket. The Valhalla layers are application-level Go code, not kernel modules.
+- **Not a literal OSI replacement.** The six Valhalla layers are numbered 1-6 as an internal convention, conceptually inspired by OSI's layered model. In actual OSI terms, the entire Valhalla stack operates within Layer 7 (Application). Bifrost is "like L2" in that it handles framing, but it does not touch Ethernet frames. Yggdrasil is "like L3" in that it routes, but it does not parse IP headers.
 - **Not a blockchain.** There is no global consensus, no mining, no tokens. Decentralization doesn't require a ledger.
 - **Not a VPN or Tor replacement.** Anonymity is a feature that can be layered in, but the core goal is a better architecture, not just privacy.
-- **Not theoretical.** This is a working proof-of-concept, not a whitepaper. Real packets flow through real code.
-- **Not a proposal to replace the internet overnight.** It runs *over* existing IP infrastructure as an overlay, proving that a better architecture is possible.
+- **Not production-ready.** The cryptographic implementations have not been audited. The demo runs nodes in a single process. This is an architectural prototype.
 
 ---
 
@@ -115,7 +123,7 @@ Every major internet innovation of the last decade has been working around the s
 - **IPFS** builds content-addressing on top of the existing stack
 - **Signal Protocol** builds end-to-end encryption above the application layer
 
-Each of these is a patch on a fundamentally broken architecture. Valhalla asks: what if we started over?
+Each of these is a patch on a fundamentally limited architecture. Valhalla asks: what if we designed the *abstractions* from scratch? Not by replacing the kernel stack, but by building an overlay that demonstrates these ideas can work together as a coherent whole.
 
 ---
 
