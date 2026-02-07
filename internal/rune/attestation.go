@@ -115,3 +115,20 @@ func (s *AttestationStore) GetBySubject(subject types.NodeID) []*Attestation {
 	}
 	return result
 }
+
+// GetByAttester returns all valid attestations made by the given attester.
+func (s *AttestationStore) GetByAttester(attester types.NodeID) []*Attestation {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	var result []*Attestation
+	now := time.Now().UnixMilli()
+	for _, atts := range s.bySubject {
+		for _, a := range atts {
+			if a.Attester == attester && a.Expires > now {
+				result = append(result, a)
+			}
+		}
+	}
+	return result
+}

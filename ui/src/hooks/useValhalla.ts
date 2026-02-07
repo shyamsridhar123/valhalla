@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useValhallaStore } from '../store/useValhallaStore';
-import type { NodeInfo, PeerLink, ScenarioInfo, StackEvent, TrustInfo } from '../types/api';
+import type { NodeInfo, PeerLink, ScenarioInfo, StackEvent, TrustInfo, FullNodeState } from '../types/api';
 
 const API_BASE = 'http://localhost:8080';
 const WS_URL = 'ws://localhost:8080/api/events';
@@ -98,6 +98,77 @@ export function useValhalla() {
     }
   }, []);
 
+  const sendMessage = useCallback(async (src: number, dst: number, message: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/interactive/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ src, dst, message }),
+      });
+      return res.json();
+    } catch { return null; }
+  }, []);
+
+  const createTrust = useCallback(async (src: number, dst: number, claim: string, confidence: number) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/interactive/trust`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ src, dst, claim, confidence }),
+      });
+      return res.json();
+    } catch { return null; }
+  }, []);
+
+  const publishContent = useCallback(async (node: number, data: string, title: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/interactive/content`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ node, data, title }),
+      });
+      return res.json();
+    } catch { return null; }
+  }, []);
+
+  const setCRDT = useCallback(async (node: number, key: string, value: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/interactive/crdt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ node, key, value }),
+      });
+      return res.json();
+    } catch { return null; }
+  }, []);
+
+  const disconnectPair = useCallback(async (nodeA: number, nodeB: number) => {
+    try {
+      await fetch(`${API_BASE}/api/interactive/disconnect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeA, nodeB }),
+      });
+    } catch { /* ignore */ }
+  }, []);
+
+  const connectPair = useCallback(async (nodeA: number, nodeB: number) => {
+    try {
+      await fetch(`${API_BASE}/api/interactive/connect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeA, nodeB }),
+      });
+    } catch { /* ignore */ }
+  }, []);
+
+  const fetchNodeState = useCallback(async (idx: number): Promise<FullNodeState | null> => {
+    try {
+      const res = await fetch(`${API_BASE}/api/interactive/state/${idx}`);
+      return res.json();
+    } catch { return null; }
+  }, []);
+
   // Initial data fetch
   useEffect(() => {
     fetchNodes();
@@ -114,5 +185,5 @@ export function useValhalla() {
     return () => clearInterval(interval);
   }, [fetchNodes, fetchPeers, fetchScenarios, fetchTrust]);
 
-  return { fetchNodes, fetchPeers, fetchTrust, runScenario };
+  return { fetchNodes, fetchPeers, fetchTrust, runScenario, sendMessage, createTrust, publishContent, setCRDT, disconnectPair, connectPair, fetchNodeState };
 }

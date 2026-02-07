@@ -27,6 +27,9 @@ interface ValhallaState {
   guidedTourActive: boolean;
   guidedTourIndex: number;
 
+  // Demo mode
+  demoMode: 'theater' | 'sandbox';
+
   // Actions
   setNodes: (nodes: NodeInfo[]) => void;
   setPeers: (peers: PeerLink[]) => void;
@@ -46,6 +49,9 @@ interface ValhallaState {
   setGuidedTourActive: (active: boolean) => void;
   setGuidedTourIndex: (index: number) => void;
   resetScenarioState: () => void;
+
+  // Demo mode action
+  setDemoMode: (mode: 'theater' | 'sandbox') => void;
 }
 
 export const useValhallaStore = create<ValhallaState>((set) => ({
@@ -66,6 +72,9 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   scenarioLayerActivity: {},
   guidedTourActive: false,
   guidedTourIndex: 0,
+
+  // Demo mode default
+  demoMode: 'theater' as const,
 
   setNodes: (nodes) => set({ nodes }),
   setPeers: (peers) => set({ peers }),
@@ -97,4 +106,7 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
       guidedTourActive: false,
       guidedTourIndex: 0,
     }),
+
+  // Demo mode
+  setDemoMode: (demoMode) => set({ demoMode }),
 }));

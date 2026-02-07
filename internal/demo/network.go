@@ -71,15 +71,28 @@ func (n *Network) Size() int {
 	return len(n.Nodes)
 }
 
-// DisconnectPair temporarily disconnects two nodes.
-func (n *Network) DisconnectPair(i, j int) {
-	// For the PoC, this is a no-op placeholder since we use direct references.
-	// In a full implementation, this would drop the connection.
-	if i < len(n.Nodes) && j < len(n.Nodes) {
-		n.Nodes[i].EmitEvent("bifrost", "peer_disconnected", map[string]string{
-			"peer": n.Nodes[j].ShortID(),
-		})
+// DisconnectPair removes the peer connection between nodes[i] and nodes[j].
+func (n *Network) DisconnectPair(i, j int) error {
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	if i < 0 || i >= len(n.Nodes) || j < 0 || j >= len(n.Nodes) || i == j {
+		return fmt.Errorf("invalid node indices: %d, %d", i, j)
 	}
+	n.Nodes[i].DisconnectPeer(n.Nodes[j].NodeID())
+	n.Nodes[j].DisconnectPeer(n.Nodes[i].NodeID())
+	return nil
+}
+
+// ReconnectPair re-establishes the peer connection between nodes[i] and nodes[j].
+func (n *Network) ReconnectPair(i, j int) error {
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	if i < 0 || i >= len(n.Nodes) || j < 0 || j >= len(n.Nodes) || i == j {
+		return fmt.Errorf("invalid node indices: %d, %d", i, j)
+	}
+	n.Nodes[i].ConnectPeer(n.Nodes[j])
+	n.Nodes[j].ConnectPeer(n.Nodes[i])
+	return nil
 }
 
 // NodeInfo returns summary info about a node suitable for API responses.

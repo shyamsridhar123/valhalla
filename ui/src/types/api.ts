@@ -31,3 +31,16 @@ export interface TrustInfo {
   claim: string;
   confidence: number;
 }
+
+export interface FullNodeState {
+  node_id: string;
+  short_id: string;
+  address: string;
+  port: number;
+  peers: { short_id: string; node_id: string }[];
+  services: string[];
+  crdt_state: Record<string, string>;
+  trust_out: { attester: string; subject: string; claim: string; confidence: number }[];
+  cache_size: number;
+  pubsub_topics: string[];
+}

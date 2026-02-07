@@ -83,6 +83,22 @@ func (n *Node) ConnectPeer(peer *Node) {
 	})
 }
 
+// DisconnectPeer removes a peer from this node's connections.
+func (n *Node) DisconnectPeer(peerID types.NodeID) bool {
+	n.mu.Lock()
+	_, existed := n.peers[peerID]
+	delete(n.peers, peerID)
+	n.mu.Unlock()
+
+	if existed {
+		n.PeerTable.RemovePeer(peerID)
+		n.EmitEvent("bifrost", "peer_disconnected", map[string]string{
+			"peer": peerID.String()[:12],
+		})
+	}
+	return existed
+}
+
 // GetPeer returns a direct peer by NodeID.
 func (n *Node) GetPeer(id types.NodeID) (*Node, bool) {
 	n.mu.RLock()
@@ -159,4 +175,76 @@ func (n *Node) PublishContent(data []byte, meta map[string]string) *saga.Content
 	n.mu.RUnlock()
 
 	return env
+}
+
+// FullNodeState is a complete snapshot for the UI inspector.
+type FullNodeState struct {
+	NodeID       string            `json:"node_id"`
+	ShortID      string            `json:"short_id"`
+	Address      string            `json:"address"`
+	Port         int               `json:"port"`
+	Peers        []PeerSummary     `json:"peers"`
+	Services     []string          `json:"services"`
+	CRDTState    map[string]string `json:"crdt_state"`
+	TrustOut     []TrustSummary    `json:"trust_out"`
+	CacheSize    int               `json:"cache_size"`
+	PubSubTopics []string          `json:"pubsub_topics"`
+}
+
+// PeerSummary is a short summary of a connected peer.
+type PeerSummary struct {
+	ShortID string `json:"short_id"`
+	NodeID  string `json:"node_id"`
+}
+
+// TrustSummary is a short summary of a trust attestation.
+type TrustSummary struct {
+	Attester   string  `json:"attester"`
+	Subject    string  `json:"subject"`
+	Claim      string  `json:"claim"`
+	Confidence float64 `json:"confidence"`
+}
+
+// GetFullState returns a comprehensive snapshot of node state for the UI.
+func (n *Node) GetFullState() FullNodeState {
+	peerList := n.Peers()
+	peerSummaries := make([]PeerSummary, len(peerList))
+	for i, p := range peerList {
+		peerSummaries[i] = PeerSummary{
+			ShortID: p.ShortID(),
+			NodeID:  p.NodeID().String(),
+		}
+	}
+
+	crdtKeys := n.CRDTStore.Keys()
+	crdtState := make(map[string]string, len(crdtKeys))
+	for _, key := range crdtKeys {
+		if val, ok := n.CRDTStore.Get(key); ok {
+			crdtState[key] = string(val)
+		}
+	}
+
+	var trustOut []TrustSummary
+	atts := n.TrustStore.GetByAttester(n.NodeID())
+	for _, att := range atts {
+		trustOut = append(trustOut, TrustSummary{
+			Attester:   att.Attester.String()[:12],
+			Subject:    att.Subject.String()[:12],
+			Claim:      att.Claim,
+			Confidence: att.Confidence,
+		})
+	}
+
+	return FullNodeState{
+		NodeID:       n.NodeID().String(),
+		ShortID:      n.ShortID(),
+		Address:      n.ListenAddr,
+		Port:         n.Port,
+		Peers:        peerSummaries,
+		Services:     n.RPCRouter.ListServices(),
+		CRDTState:    crdtState,
+		TrustOut:     trustOut,
+		CacheSize:    n.Cache.Size(),
+		PubSubTopics: n.PubSub.Topics(),
+	}
 }

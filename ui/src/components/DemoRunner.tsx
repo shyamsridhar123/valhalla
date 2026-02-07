@@ -8,6 +8,7 @@ import { ScenarioCard } from './ScenarioCard';
 import { ScenarioViz } from './ScenarioViz';
 import { NarrationTimeline } from './NarrationTimeline';
 import { LayerActivityBar } from './LayerActivityBar';
+import { SandboxMode } from './SandboxMode';
 
 export function DemoRunner() {
   const scenarios = useValhallaStore((s) => s.scenarios);
@@ -27,6 +28,8 @@ export function DemoRunner() {
   const guidedTourIndex = useValhallaStore((s) => s.guidedTourIndex);
   const setGuidedTourIndex = useValhallaStore((s) => s.setGuidedTourIndex);
   const resetScenarioState = useValhallaStore((s) => s.resetScenarioState);
+  const demoMode = useValhallaStore((s) => s.demoMode);
+  const setDemoMode = useValhallaStore((s) => s.setDemoMode);
 
   const { runScenario } = useValhalla();
   const tourTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -165,379 +168,418 @@ export function DemoRunner() {
         overflow: 'hidden',
       }}
     >
-      {/* Tour progress bar */}
-      {guidedTourActive && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 20px',
-            borderBottom: `1px solid ${colors.borderSubtle}`,
-            background: 'rgba(74,158,255,0.04)',
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: colors.accentBlue,
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-              flexShrink: 0,
-            }}
-          >
-            Guided Tour
-          </span>
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              gap: 4,
-              alignItems: 'center',
-            }}
-          >
-            {SCENARIO_ORDER.map((id, i) => {
-              const sMeta = SCENARIO_META[id];
-              const isDone = i < guidedTourIndex;
-              const isCurrent = i === guidedTourIndex;
-              return (
-                <div
-                  key={id}
-                  style={{
-                    flex: 1,
-                    height: 4,
-                    borderRadius: 2,
-                    background: isDone
-                      ? colors.accentGreen
-                      : isCurrent
-                        ? sMeta.gradient[0]
-                        : colors.borderStrong,
-                    transition: 'background 0.3s',
-                  }}
-                />
-              );
-            })}
-          </div>
-          <span
-            style={{
-              fontSize: 10,
-              color: colors.textDim,
-              fontFamily: fonts.mono,
-              flexShrink: 0,
-            }}
-          >
-            {guidedTourIndex + 1}/{SCENARIO_ORDER.length}
-          </span>
+      {/* Mode toggle */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '6px 20px',
+        borderBottom: `1px solid ${colors.borderSubtle}`,
+        flexShrink: 0,
+        background: colors.surface2,
+      }}>
+        {(['theater', 'sandbox'] as const).map(mode => (
           <button
-            onClick={handleCancelTour}
+            key={mode}
+            onClick={() => setDemoMode(mode)}
             style={{
-              background: 'none',
-              border: `1px solid ${colors.borderStrong}`,
-              borderRadius: 4,
-              color: colors.textDim,
-              fontSize: 10,
-              padding: '2px 8px',
+              background: demoMode === mode ? 'rgba(74,158,255,0.15)' : 'none',
+              border: `1px solid ${demoMode === mode ? colors.accentBlue : colors.borderDefault}`,
+              borderRadius: 6,
+              padding: '5px 14px',
+              color: demoMode === mode ? colors.accentBlue : colors.textDim,
+              fontSize: 12,
+              fontWeight: 600,
               cursor: 'pointer',
-              flexShrink: 0,
+              transition: 'all 0.15s',
             }}
           >
-            Stop
+            {mode === 'theater' ? 'Scenario Theater' : 'Sandbox'}
           </button>
+        ))}
+      </div>
+
+      {demoMode === 'sandbox' ? (
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <SandboxMode />
         </div>
-      )}
-
-      {/* Main content */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <AnimatePresence mode="wait">
-          {scenarioPhase === 'selecting' ? (
-            <m.div
-              key="selecting"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
+      ) : (
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {/* Tour progress bar */}
+          {guidedTourActive && (
+            <div
               style={{
-                height: '100%',
-                overflow: 'auto',
-                padding: '24px 20px',
-              }}
-            >
-              {/* Header */}
-              <div
-                style={{
-                  marginBottom: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div>
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: 18,
-                      fontWeight: 800,
-                      color: '#fff',
-                      letterSpacing: 0.5,
-                    }}
-                  >
-                    Scenario Theater
-                  </h3>
-                  <p
-                    style={{
-                      margin: '4px 0 0',
-                      fontSize: 13,
-                      color: colors.textDim,
-                    }}
-                  >
-                    Experience the Valhalla stack in action
-                  </p>
-                </div>
-                <m.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleStartTour}
-                  disabled={scenarios.length === 0}
-                  style={{
-                    background:
-                      'linear-gradient(135deg, #4a9eff, #7b68ee)',
-                    border: 'none',
-                    borderRadius: 8,
-                    padding: '10px 20px',
-                    color: '#fff',
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor:
-                      scenarios.length === 0
-                        ? 'not-allowed'
-                        : 'pointer',
-                    letterSpacing: 0.3,
-                    opacity: scenarios.length === 0 ? 0.5 : 1,
-                  }}
-                >
-                  Start Guided Tour
-                </m.button>
-              </div>
-
-              {/* Scenario cards grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns:
-                    'repeat(auto-fill, minmax(260px, 1fr))',
-                  gap: 16,
-                }}
-              >
-                {scenarios.map((sc) => {
-                  const sMeta = SCENARIO_META[sc.name];
-                  if (!sMeta) return null;
-                  return (
-                    <ScenarioCard
-                      key={sc.name}
-                      meta={sMeta}
-                      description={sc.description}
-                      isDisabled={false}
-                      onSelect={() => launchScenario(sc.name)}
-                    />
-                  );
-                })}
-              </div>
-
-              {scenarios.length === 0 && (
-                <div
-                  style={{
-                    color: colors.textDim,
-                    textAlign: 'center',
-                    padding: 48,
-                    fontSize: 14,
-                  }}
-                >
-                  No scenarios available. Start the daemon with{' '}
-                  <code
-                    style={{
-                      background: colors.surface2,
-                      padding: '2px 6px',
-                      borderRadius: 4,
-                    }}
-                  >
-                    --demo
-                  </code>{' '}
-                  flag.
-                </div>
-              )}
-            </m.div>
-          ) : (
-            <m.div
-              key="playing"
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              style={{
-                height: '100%',
                 display: 'flex',
-                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 20px',
+                borderBottom: `1px solid ${colors.borderSubtle}`,
+                background: 'rgba(74,158,255,0.04)',
+                flexShrink: 0,
               }}
             >
-              {/* Playback header */}
-              <div
+              <span
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '10px 16px',
-                  borderBottom: `1px solid ${colors.borderSubtle}`,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: colors.accentBlue,
+                  textTransform: 'uppercase',
+                  letterSpacing: 1,
                   flexShrink: 0,
                 }}
               >
-                <m.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleBack}
-                  style={{
-                    background: 'none',
-                    border: `1px solid ${colors.borderStrong}`,
-                    borderRadius: 6,
-                    padding: '4px 12px',
-                    color: colors.textDim,
-                    fontSize: 12,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>&larr;</span> Back
-                </m.button>
-
-                {meta && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                    }}
-                  >
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      {meta.layers.map((layer) => (
-                        <div
-                          key={layer}
-                          style={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            background: getLayerColor(layer),
-                            boxShadow: scenarioLayerActivity[layer]
-                              ? `0 0 8px ${getLayerColor(layer)}60`
-                              : 'none',
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 14,
-                        color: '#fff',
-                      }}
-                    >
-                      {meta.title}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: meta.gradient[0],
-                        fontWeight: 600,
-                      }}
-                    >
-                      {meta.subtitle}
-                    </span>
-                  </div>
-                )}
-
-                <div style={{ marginLeft: 'auto' }}>
-                  {scenarioPhase === 'playing' && (
-                    <m.span
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      style={{
-                        fontSize: 11,
-                        color: colors.accentBlue,
-                        fontWeight: 600,
-                      }}
-                    >
-                      Running
-                    </m.span>
-                  )}
-                  {scenarioPhase === 'complete' && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: colors.accentGreen,
-                        fontWeight: 600,
-                      }}
-                    >
-                      Complete
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Split view: visualization + timeline */}
+                Guided Tour
+              </span>
               <div
                 style={{
                   flex: 1,
                   display: 'flex',
-                  overflow: 'hidden',
+                  gap: 4,
+                  alignItems: 'center',
                 }}
               >
-                {/* Visualization panel */}
-                <div
+                {SCENARIO_ORDER.map((id, i) => {
+                  const sMeta = SCENARIO_META[id];
+                  const isDone = i < guidedTourIndex;
+                  const isCurrent = i === guidedTourIndex;
+                  return (
+                    <div
+                      key={id}
+                      style={{
+                        flex: 1,
+                        height: 4,
+                        borderRadius: 2,
+                        background: isDone
+                          ? colors.accentGreen
+                          : isCurrent
+                            ? sMeta.gradient[0]
+                            : colors.borderStrong,
+                        transition: 'background 0.3s',
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <span
+                style={{
+                  fontSize: 10,
+                  color: colors.textDim,
+                  fontFamily: fonts.mono,
+                  flexShrink: 0,
+                }}
+              >
+                {guidedTourIndex + 1}/{SCENARIO_ORDER.length}
+              </span>
+              <button
+                onClick={handleCancelTour}
+                style={{
+                  background: 'none',
+                  border: `1px solid ${colors.borderStrong}`,
+                  borderRadius: 4,
+                  color: colors.textDim,
+                  fontSize: 10,
+                  padding: '2px 8px',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                Stop
+              </button>
+            </div>
+          )}
+
+          {/* Main content */}
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <AnimatePresence mode="wait">
+              {scenarioPhase === 'selecting' ? (
+                <m.div
+                  key="selecting"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                   style={{
-                    flex: '1 1 65%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: colors.surface1,
-                    overflow: 'hidden',
-                    position: 'relative',
+                    height: '100%',
+                    overflow: 'auto',
+                    padding: '24px 20px',
                   }}
                 >
-                  {runningScenario && (
-                    <ScenarioViz
-                      scenario={runningScenario}
-                      narrations={narrations}
-                      isComplete={isComplete}
-                    />
-                  )}
-                </div>
+                  {/* Header */}
+                  <div
+                    style={{
+                      marginBottom: 24,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div>
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontSize: 18,
+                          fontWeight: 800,
+                          color: '#fff',
+                          letterSpacing: 0.5,
+                        }}
+                      >
+                        Scenario Theater
+                      </h3>
+                      <p
+                        style={{
+                          margin: '4px 0 0',
+                          fontSize: 13,
+                          color: colors.textDim,
+                        }}
+                      >
+                        Experience the Valhalla stack in action
+                      </p>
+                    </div>
+                    <m.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={handleStartTour}
+                      disabled={scenarios.length === 0}
+                      style={{
+                        background:
+                          'linear-gradient(135deg, #4a9eff, #7b68ee)',
+                        border: 'none',
+                        borderRadius: 8,
+                        padding: '10px 20px',
+                        color: '#fff',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor:
+                          scenarios.length === 0
+                            ? 'not-allowed'
+                            : 'pointer',
+                        letterSpacing: 0.3,
+                        opacity: scenarios.length === 0 ? 0.5 : 1,
+                      }}
+                    >
+                      Start Guided Tour
+                    </m.button>
+                  </div>
 
-                {/* Timeline panel */}
-                <div
+                  {/* Scenario cards grid */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        'repeat(auto-fill, minmax(260px, 1fr))',
+                      gap: 16,
+                    }}
+                  >
+                    {scenarios.map((sc) => {
+                      const sMeta = SCENARIO_META[sc.name];
+                      if (!sMeta) return null;
+                      return (
+                        <ScenarioCard
+                          key={sc.name}
+                          meta={sMeta}
+                          description={sc.description}
+                          isDisabled={false}
+                          onSelect={() => launchScenario(sc.name)}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  {scenarios.length === 0 && (
+                    <div
+                      style={{
+                        color: colors.textDim,
+                        textAlign: 'center',
+                        padding: 48,
+                        fontSize: 14,
+                      }}
+                    >
+                      No scenarios available. Start the daemon with{' '}
+                      <code
+                        style={{
+                          background: colors.surface2,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                        }}
+                      >
+                        --demo
+                      </code>{' '}
+                      flag.
+                    </div>
+                  )}
+                </m.div>
+              ) : (
+                <m.div
+                  key="playing"
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
                   style={{
-                    flex: '0 0 35%',
-                    maxWidth: 360,
-                    borderLeft: `1px solid ${colors.borderSubtle}`,
-                    overflow: 'hidden',
+                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    background: colors.surface0,
                   }}
                 >
-                  <NarrationTimeline
-                    narrations={narrations}
-                    isComplete={isComplete}
-                  />
-                </div>
-              </div>
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
+                  {/* Playback header */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '10px 16px',
+                      borderBottom: `1px solid ${colors.borderSubtle}`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <m.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleBack}
+                      style={{
+                        background: 'none',
+                        border: `1px solid ${colors.borderStrong}`,
+                        borderRadius: 6,
+                        padding: '4px 12px',
+                        color: colors.textDim,
+                        fontSize: 12,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <span style={{ fontSize: 14 }}>&larr;</span> Back
+                    </m.button>
 
-      {/* Layer activity bar */}
+                    {meta && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          {meta.layers.map((layer) => (
+                            <div
+                              key={layer}
+                              style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                background: getLayerColor(layer),
+                                boxShadow: scenarioLayerActivity[layer]
+                                  ? `0 0 8px ${getLayerColor(layer)}60`
+                                  : 'none',
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 14,
+                            color: '#fff',
+                          }}
+                        >
+                          {meta.title}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: meta.gradient[0],
+                            fontWeight: 600,
+                          }}
+                        >
+                          {meta.subtitle}
+                        </span>
+                      </div>
+                    )}
+
+                    <div style={{ marginLeft: 'auto' }}>
+                      {scenarioPhase === 'playing' && (
+                        <m.span
+                          animate={{ opacity: [0.4, 1, 0.4] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          style={{
+                            fontSize: 11,
+                            color: colors.accentBlue,
+                            fontWeight: 600,
+                          }}
+                        >
+                          Running
+                        </m.span>
+                      )}
+                      {scenarioPhase === 'complete' && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: colors.accentGreen,
+                            fontWeight: 600,
+                          }}
+                        >
+                          Complete
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Split view: visualization + timeline */}
+                  <div
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {/* Visualization panel */}
+                    <div
+                      style={{
+                        flex: '1 1 65%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: colors.surface1,
+                        overflow: 'hidden',
+                        position: 'relative',
+                      }}
+                    >
+                      {runningScenario && (
+                        <ScenarioViz
+                          scenario={runningScenario}
+                          narrations={narrations}
+                          isComplete={isComplete}
+                        />
+                      )}
+                    </div>
+
+                    {/* Timeline panel */}
+                    <div
+                      style={{
+                        flex: '0 0 35%',
+                        maxWidth: 360,
+                        borderLeft: `1px solid ${colors.borderSubtle}`,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: colors.surface0,
+                      }}
+                    >
+                      <NarrationTimeline
+                        narrations={narrations}
+                        isComplete={isComplete}
+                      />
+                    </div>
+                  </div>
+                </m.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {/* Layer activity bar - show for both modes */}
       <LayerActivityBar activity={scenarioLayerActivity} />
     </div>
   );
