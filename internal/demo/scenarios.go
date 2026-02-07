@@ -168,29 +168,29 @@ func scenarioTrustWeb(ctx context.Context, net *Network, narrate func(string)) e
 	narrate("Building a web of trust...")
 	pause(ctx, 300*time.Millisecond)
 
-	store := vrune.NewAttestationStore()
-
-	// Alice attests Bob
+	// Alice attests Bob — store on Bob's TrustStore (subject) and Alice's (attester)
 	att1 := vrune.CreateAttestation(alice.Identity, bob.NodeID(), "is-trusted", 0.9, time.Hour)
-	store.Add(att1)
+	bob.TrustStore.Add(att1)
+	alice.TrustStore.Add(att1)
 	narrate(fmt.Sprintf("Alice attests Bob: \"is-trusted\" (confidence: 0.9)"))
 	alice.EmitEvent("rune", "attestation_created", map[string]string{
 		"subject": bob.ShortID(), "claim": "is-trusted", "confidence": "0.9",
 	})
 	pause(ctx, 300*time.Millisecond)
 
-	// Bob attests Carol
+	// Bob attests Carol — store on Carol's TrustStore (subject) and Bob's (attester)
 	att2 := vrune.CreateAttestation(bob.Identity, carol.NodeID(), "is-trusted", 0.85, time.Hour)
-	store.Add(att2)
+	carol.TrustStore.Add(att2)
+	bob.TrustStore.Add(att2)
 	narrate(fmt.Sprintf("Bob attests Carol: \"is-trusted\" (confidence: 0.85)"))
 	bob.EmitEvent("rune", "attestation_created", map[string]string{
 		"subject": carol.ShortID(), "claim": "is-trusted", "confidence": "0.85",
 	})
 	pause(ctx, 300*time.Millisecond)
 
-	// Compute trust
-	trustBob := vrune.ComputeTrust(store, alice.NodeID(), bob.NodeID())
-	trustCarol := vrune.ComputeTrust(store, alice.NodeID(), carol.NodeID())
+	// Compute trust using Alice's store which has both attestations
+	trustBob := vrune.ComputeTrust(alice.TrustStore, alice.NodeID(), bob.NodeID())
+	trustCarol := vrune.ComputeTrust(alice.TrustStore, alice.NodeID(), carol.NodeID())
 
 	narrate(fmt.Sprintf("Alice's trust in Bob (direct): %.2f", trustBob))
 	narrate(fmt.Sprintf("Alice's trust in Carol (transitive via Bob): %.2f", trustCarol))
