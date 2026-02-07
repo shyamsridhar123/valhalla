@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { useValhalla } from './hooks/useValhalla';
 import { useValhallaStore } from './store/useValhallaStore';
@@ -5,6 +6,7 @@ import { NetworkGraph } from './components/NetworkGraph';
 import { StackView } from './components/StackView';
 import { DemoRunner } from './components/DemoRunner';
 import { EventLog } from './components/EventLog';
+import { ApiDocs } from './components/ApiDocs';
 import { colors } from './theme';
 import './App.css';
 
@@ -28,6 +30,7 @@ function App() {
   const setActiveTab = useValhallaStore((s) => s.setActiveTab);
   const events = useValhallaStore((s) => s.events);
   const nodes = useValhallaStore((s) => s.nodes);
+  const [showApiDocs, setShowApiDocs] = useState(false);
 
   const lastLayerEvent = [...events].reverse().find((e) => e.layer !== 'demo');
 
@@ -52,6 +55,23 @@ function App() {
           <span style={{ color: colors.textDim, fontSize: 12, fontWeight: 500 }}>Proof of Concept</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => setShowApiDocs(true)}
+            style={{
+              background: 'rgba(74, 158, 255, 0.08)',
+              border: '1px solid rgba(74, 158, 255, 0.25)',
+              color: colors.accentBlue,
+              borderRadius: 6,
+              padding: '4px 12px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              letterSpacing: 0.5,
+              transition: 'all 0.15s',
+            }}
+          >
+            API Docs
+          </button>
           <div style={{
             width: 6, height: 6, borderRadius: '50%',
             background: nodes.length > 0 ? colors.online : colors.offline,
@@ -114,6 +134,9 @@ function App() {
           <EventLog />
         </div>
       </div>
+
+      {/* API Docs Modal */}
+      {showApiDocs && <ApiDocs onClose={() => setShowApiDocs(false)} />}
     </div>
   );
 }

@@ -53,6 +53,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/api/trust", s.handleTrust)
 	s.mux.HandleFunc("/api/events", s.handleEvents)
 	s.mux.HandleFunc("/api/health", s.handleHealth)
+	s.mux.HandleFunc("/api/docs", s.handleOpenAPISpec)
 
 	// Interactive sandbox endpoints
 	s.mux.HandleFunc("/api/interactive/message", s.handleSendMessage)
