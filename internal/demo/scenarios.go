@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	vrune "github.com/valhalla/valhalla/internal/rune"
 	"github.com/valhalla/valhalla/internal/saga"
 	"github.com/valhalla/valhalla/internal/types"
 )
@@ -33,6 +34,11 @@ func AllScenarios() []Scenario {
 			Name:        "content-sharing",
 			Description: "Content published by one node is discovered and retrieved by another",
 			Run:         scenarioContentSharing,
+		},
+		{
+			Name:        "trust-web",
+			Description: "Nodes build a web of trust through attestations",
+			Run:         scenarioTrustWeb,
 		},
 		{
 			Name:        "service-discovery",
@@ -150,6 +156,45 @@ func scenarioContentSharing(ctx context.Context, net *Network, narrate func(stri
 	narrate(fmt.Sprintf("  ↳ Retrieved %d bytes, publisher: %s",
 		len(retrieved.Data), retrieved.Publisher.String()[:12]))
 	narrate(fmt.Sprintf("  ↳ Signature valid: %v", saga.VerifyEnvelope(retrieved) == nil))
+
+	return nil
+}
+
+func scenarioTrustWeb(ctx context.Context, net *Network, narrate func(string)) error {
+	alice := net.NodeByIndex(0)
+	bob := net.NodeByIndex(1)
+	carol := net.NodeByIndex(2)
+
+	narrate("Building a web of trust...")
+	pause(ctx, 300*time.Millisecond)
+
+	// Alice attests Bob — store on Bob's TrustStore (subject) and Alice's (attester)
+	att1 := vrune.CreateAttestation(alice.Identity, bob.NodeID(), "is-trusted", 0.9, time.Hour)
+	bob.TrustStore.Add(att1)
+	alice.TrustStore.Add(att1)
+	narrate(fmt.Sprintf("Alice attests Bob: \"is-trusted\" (confidence: 0.9)"))
+	alice.EmitEvent("rune", "attestation_created", map[string]string{
+		"subject": bob.ShortID(), "claim": "is-trusted", "confidence": "0.9",
+	})
+	pause(ctx, 300*time.Millisecond)
+
+	// Bob attests Carol — store on Carol's TrustStore (subject) and Bob's (attester)
+	att2 := vrune.CreateAttestation(bob.Identity, carol.NodeID(), "is-trusted", 0.85, time.Hour)
+	carol.TrustStore.Add(att2)
+	bob.TrustStore.Add(att2)
+	narrate(fmt.Sprintf("Bob attests Carol: \"is-trusted\" (confidence: 0.85)"))
+	bob.EmitEvent("rune", "attestation_created", map[string]string{
+		"subject": carol.ShortID(), "claim": "is-trusted", "confidence": "0.85",
+	})
+	pause(ctx, 300*time.Millisecond)
+
+	// Compute trust using Alice's store which has both attestations
+	trustBob := vrune.ComputeTrust(alice.TrustStore, alice.NodeID(), bob.NodeID())
+	trustCarol := vrune.ComputeTrust(alice.TrustStore, alice.NodeID(), carol.NodeID())
+
+	narrate(fmt.Sprintf("Alice's trust in Bob (direct): %.2f", trustBob))
+	narrate(fmt.Sprintf("Alice's trust in Carol (transitive via Bob): %.2f", trustCarol))
+	narrate(fmt.Sprintf("Trust decays transitively: %.2f < %.2f", trustCarol, trustBob))
 
 	return nil
 }

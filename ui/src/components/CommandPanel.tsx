@@ -4,10 +4,11 @@ import { useValhalla } from '../hooks/useValhalla';
 import { useValhallaStore } from '../store/useValhallaStore';
 import { colors, fonts, layerColors, NODE_NAMES } from '../theme';
 
-type CommandType = 'message' | 'content' | 'crdt' | 'disconnect' | 'connect';
+type CommandType = 'message' | 'trust' | 'content' | 'crdt' | 'disconnect' | 'connect';
 
 const COMMANDS: { type: CommandType; label: string; icon: string; layer: string }[] = [
   { type: 'message', label: 'Send Message', icon: '\u2709', layer: 'veil' },
+  { type: 'trust', label: 'Add Trust', icon: '\u2693', layer: 'rune' },
   { type: 'content', label: 'Publish', icon: '\u2301', layer: 'saga' },
   { type: 'crdt', label: 'Set CRDT', icon: '\u21c4', layer: 'realm' },
   { type: 'disconnect', label: 'Disconnect', icon: '\u2702', layer: 'bifrost' },
@@ -20,12 +21,14 @@ export function CommandPanel() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const nodes = useValhallaStore(s => s.nodes);
-  const { sendMessage, publishContent, setCRDT, disconnectPair, connectPair } = useValhalla();
+  const { sendMessage, createTrust, publishContent, setCRDT, disconnectPair, connectPair } = useValhalla();
 
   // Form state
   const [src, setSrc] = useState(0);
   const [dst, setDst] = useState(1);
   const [msgText, setMsgText] = useState('Hello from the sandbox!');
+  const [claim, setClaim] = useState('is-trusted');
+  const [confidence, setConfidence] = useState(0.9);
   const [contentData, setContentData] = useState('Sample content');
   const [contentTitle, setContentTitle] = useState('my-doc');
   const [crdtKey, setCrdtKey] = useState('counter');
@@ -42,6 +45,10 @@ export function CommandPanel() {
         case 'message':
           res = await sendMessage(src, dst, msgText);
           setResult(res ? `Delivered: ${res.from} -> ${res.to}` : 'Failed');
+          break;
+        case 'trust':
+          res = await createTrust(src, dst, claim, confidence);
+          setResult(res ? `Trust created: ${res.attester} trusts ${res.subject} (${res.confidence})` : 'Failed');
           break;
         case 'content':
           res = await publishContent(src, contentData, contentTitle);
@@ -64,8 +71,8 @@ export function CommandPanel() {
       setResult('Error executing command');
     }
     setLoading(false);
-  }, [activeCmd, src, dst, msgText, contentData, contentTitle, crdtKey, crdtValue,
-      sendMessage, publishContent, setCRDT, disconnectPair, connectPair]);
+  }, [activeCmd, src, dst, msgText, claim, confidence, contentData, contentTitle, crdtKey, crdtValue,
+      sendMessage, createTrust, publishContent, setCRDT, disconnectPair, connectPair]);
 
   // Helper for node select dropdown
   const NodeSelect = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
@@ -177,7 +184,7 @@ export function CommandPanel() {
               style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
             >
               {/* Dynamic form fields */}
-              {(activeCmd === 'message' || activeCmd === 'disconnect' || activeCmd === 'connect') && (
+              {(activeCmd === 'message' || activeCmd === 'trust' || activeCmd === 'disconnect' || activeCmd === 'connect') && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   <NodeSelect value={src} onChange={setSrc} label="From Node" />
                   <NodeSelect value={dst} onChange={setDst} label="To Node" />
@@ -189,6 +196,26 @@ export function CommandPanel() {
                   <label style={{ fontSize: 10, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>Message</label>
                   <input value={msgText} onChange={e => setMsgText(e.target.value)} style={inputStyle} placeholder="Type a message..." />
                 </div>
+              )}
+
+              {activeCmd === 'trust' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <label style={{ fontSize: 10, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>Claim</label>
+                    <input value={claim} onChange={e => setClaim(e.target.value)} style={inputStyle} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <label style={{ fontSize: 10, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      Confidence: {confidence.toFixed(2)}
+                    </label>
+                    <input
+                      type="range" min="0" max="1" step="0.05"
+                      value={confidence}
+                      onChange={e => setConfidence(Number(e.target.value))}
+                      style={{ width: '100%', accentColor: layerColors.rune }}
+                    />
+                  </div>
+                </>
               )}
 
               {(activeCmd === 'content' || activeCmd === 'crdt') && (

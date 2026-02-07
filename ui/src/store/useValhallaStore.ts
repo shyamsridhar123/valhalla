@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { NodeInfo, PeerLink, StackEvent, ScenarioInfo } from '../types/api';
+import type { NodeInfo, PeerLink, StackEvent, ScenarioInfo, TrustInfo } from '../types/api';
 
 export type ScenarioPhase = 'selecting' | 'playing' | 'complete';
 
@@ -8,13 +8,14 @@ interface ValhallaState {
   nodes: NodeInfo[];
   peers: PeerLink[];
   scenarios: ScenarioInfo[];
+  attestations: TrustInfo[];
 
   // Event stream
   events: StackEvent[];
   maxEvents: number;
 
   // UI state
-  activeTab: 'network' | 'stack' | 'demos';
+  activeTab: 'network' | 'stack' | 'demos' | 'trust';
   selectedNode: string | null;
   runningScenario: string | null;
   eventLayerFilter: string | null;
@@ -33,6 +34,7 @@ interface ValhallaState {
   setNodes: (nodes: NodeInfo[]) => void;
   setPeers: (peers: PeerLink[]) => void;
   setScenarios: (scenarios: ScenarioInfo[]) => void;
+  setAttestations: (attestations: TrustInfo[]) => void;
   addEvent: (event: StackEvent) => void;
   clearEvents: () => void;
   setActiveTab: (tab: ValhallaState['activeTab']) => void;
@@ -56,6 +58,7 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   nodes: [],
   peers: [],
   scenarios: [],
+  attestations: [],
   events: [],
   maxEvents: 500,
   activeTab: 'network',
@@ -76,6 +79,7 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   setNodes: (nodes) => set({ nodes }),
   setPeers: (peers) => set({ peers }),
   setScenarios: (scenarios) => set({ scenarios }),
+  setAttestations: (attestations) => set({ attestations }),
 
   addEvent: (event) =>
     set((state) => ({

@@ -30,6 +30,13 @@ export const SCENARIO_META: Record<string, ScenarioMeta> = {
     layers: ['saga', 'veil'],
     gradient: ['#f1c40f', '#2ecc71'],
   },
+  'trust-web': {
+    id: 'trust-web',
+    title: 'Trust Web',
+    subtitle: 'Decentralized Trust',
+    layers: ['rune'],
+    gradient: ['#e67e22', '#e74c3c'],
+  },
   'service-discovery': {
     id: 'service-discovery',
     title: 'Service Discovery',
@@ -50,6 +57,7 @@ export const SCENARIO_ORDER = [
   'mesh-formation',
   'encrypted-chat',
   'content-sharing',
+  'trust-web',
   'service-discovery',
   'state-sync',
 ] as const;

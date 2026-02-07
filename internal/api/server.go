@@ -10,6 +10,7 @@ import (
 
 	"github.com/valhalla/valhalla/internal/demo"
 	"github.com/valhalla/valhalla/internal/realm"
+	vrune "github.com/valhalla/valhalla/internal/rune"
 	"github.com/valhalla/valhalla/internal/types"
 )
 
@@ -49,11 +50,13 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/api/scenarios", s.handleScenarios)
 	s.mux.HandleFunc("/api/scenarios/run", s.handleRunScenario)
 	s.mux.HandleFunc("/api/content", s.handleContent)
+	s.mux.HandleFunc("/api/trust", s.handleTrust)
 	s.mux.HandleFunc("/api/events", s.handleEvents)
 	s.mux.HandleFunc("/api/health", s.handleHealth)
 
 	// Interactive sandbox endpoints
 	s.mux.HandleFunc("/api/interactive/message", s.handleSendMessage)
+	s.mux.HandleFunc("/api/interactive/trust", s.handleCreateTrust)
 	s.mux.HandleFunc("/api/interactive/content", s.handlePublishContent)
 	s.mux.HandleFunc("/api/interactive/crdt", s.handleCRDTSet)
 	s.mux.HandleFunc("/api/interactive/state/", s.handleNodeFullState)
@@ -212,6 +215,32 @@ func (s *Server) handleContent(w http.ResponseWriter, r *http.Request) {
 	_ = seen
 }
 
+func (s *Server) handleTrust(w http.ResponseWriter, r *http.Request) {
+	type TrustInfo struct {
+		Attester   string  `json:"attester"`
+		Subject    string  `json:"subject"`
+		Claim      string  `json:"claim"`
+		Confidence float64 `json:"confidence"`
+	}
+
+	// Aggregate attestations from all nodes
+	var attestations []TrustInfo
+	for _, nd := range s.net.Nodes {
+		// Get attestations where this node is the subject
+		atts := nd.TrustStore.GetBySubject(nd.NodeID())
+		for _, att := range atts {
+			attestations = append(attestations, TrustInfo{
+				Attester:   att.Attester.String()[:12],
+				Subject:    att.Subject.String()[:12],
+				Claim:      att.Claim,
+				Confidence: att.Confidence,
+			})
+		}
+	}
+
+	writeJSON(w, attestations)
+}
+
 func (s *Server) handleEvents(w http.ResponseWriter, r *http.Request) {
 	s.eventHub.ServeHTTP(w, r)
 }
@@ -312,6 +341,57 @@ func (s *Server) handleSendMessage(w http.ResponseWriter, r *http.Request) {
 		"status": "delivered",
 		"from":   src.ShortID(),
 		"to":     tgt.ShortID(),
+	})
+}
+
+func (s *Server) handleCreateTrust(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		Src        int     `json:"src"`
+		Dst        int     `json:"dst"`
+		Claim      string  `json:"claim"`
+		Confidence float64 `json:"confidence"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	src := s.net.NodeByIndex(req.Src)
+	tgt := s.net.NodeByIndex(req.Dst)
+	if src == nil || tgt == nil {
+		http.Error(w, "invalid node index", http.StatusBadRequest)
+		return
+	}
+
+	att := vrune.CreateAttestation(src.Identity, tgt.NodeID(), req.Claim, req.Confidence, time.Hour)
+	if err := src.TrustStore.Add(att); err != nil {
+		http.Error(w, fmt.Sprintf("store attestation on source: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if err := tgt.TrustStore.Add(att); err != nil {
+		http.Error(w, fmt.Sprintf("store attestation on target: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	src.EmitEvent("rune", "attestation_created", map[string]string{
+		"subject":    tgt.ShortID(),
+		"claim":      req.Claim,
+		"confidence": fmt.Sprintf("%.2f", req.Confidence),
+	})
+
+	s.narrate(fmt.Sprintf("Node %d (%s) attests Node %d (%s): %q (confidence: %.2f)",
+		req.Src, src.ShortID(), req.Dst, tgt.ShortID(), req.Claim, req.Confidence))
+
+	writeJSON(w, map[string]interface{}{
+		"status":     "created",
+		"attester":   src.ShortID(),
+		"subject":    tgt.ShortID(),
+		"confidence": req.Confidence,
 	})
 }
 
