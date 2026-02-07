@@ -53,12 +53,12 @@ export const layerColors: Record<string, string> = {
 };
 
 export const layers = [
-  { name: 'Realm', key: 'realm', color: '#f85149', osi: 'Application (L7)', desc: 'P2P RPC, Pub/Sub, CRDT' },
-  { name: 'Rune', key: 'rune', color: '#e67e22', osi: 'Presentation (L6)', desc: 'Trust, attestations, capabilities' },
-  { name: 'Saga', key: 'saga', color: '#FACC15', osi: 'Session (L5)', desc: 'Content addressing, intents' },
-  { name: 'Veil', key: 'veil', color: '#4ECB71', osi: 'Transport (L4)', desc: 'Encryption, stream mux' },
-  { name: 'Yggdrasil', key: 'yggdrasil', color: '#58A6FF', osi: 'Network (L3)', desc: 'Identity, DHT, routing' },
-  { name: 'Bifrost', key: 'bifrost', color: '#8957E5', osi: 'Data Link (L2)', desc: 'Frame codec, transport' },
+  { name: 'Realm', key: 'realm', color: '#f85149', osi: 'App Mesh (V6)', desc: 'P2P RPC, Pub/Sub, CRDT' },
+  { name: 'Rune', key: 'rune', color: '#e67e22', osi: 'Trust (V5)', desc: 'Trust, attestations, capabilities' },
+  { name: 'Saga', key: 'saga', color: '#FACC15', osi: 'Intent (V4)', desc: 'Content addressing, intents' },
+  { name: 'Veil', key: 'veil', color: '#4ECB71', osi: 'Flow (V3)', desc: 'Encryption, stream mux' },
+  { name: 'Yggdrasil', key: 'yggdrasil', color: '#58A6FF', osi: 'Mesh (V2)', desc: 'Identity, DHT, routing' },
+  { name: 'Bifrost', key: 'bifrost', color: '#8957E5', osi: 'Bridge (V1)', desc: 'Frame codec, transport' },
 ] as const;
 
 // --- Typography ---

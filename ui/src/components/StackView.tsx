@@ -488,10 +488,10 @@ export function StackView({ activeLayer }: StackViewProps) {
               {/* Network mapping legend */}
               <div style={{ marginTop: 12 }}>
                 <div style={{ fontSize: 9, color: colors.textDim, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
-                  Stack vs OSI Model
+                  Overlay Stack (V1–V6)
                 </div>
                 <div style={{ fontSize: 10, color: colors.textMuted, lineHeight: 1.6 }}>
-                  The Valhalla stack maps to OSI layers L2-L7, replacing traditional protocols with decentralized, identity-first equivalents.
+                  The Valhalla stack uses its own 6-layer numbering (V1–V6). In OSI terms, the entire stack runs within Layer 7 (Application), riding on the host OS TCP/IP stack.
                 </div>
               </div>
             </div>
