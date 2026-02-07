@@ -1,0 +1,53 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# AI assistant IDE configs (symlinks to .agents/skills)
+.agent/
+.claude/
+.cline/
+.codebuddy/
+skills/
+
+# Go
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.out
+*.test
+cover.out
+coverage.html
+
+# Node / React / Vite
+node_modules/
+ui/dist/
+ui/build/
+.cache/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs & temp
+*.log
+*.tmp
+*.temp
+.temp/
