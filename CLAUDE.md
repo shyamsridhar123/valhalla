@@ -46,3 +46,26 @@
 - **context7** — Live library documentation lookup
 - **playwright** — Browser automation and testing
 - **security-guidance** — Security best practices (automatic)
+
+## Issue Tracking — Beads (`bd`)
+
+This project uses **beads** for issue tracking. See `AGENTS.md` for full workflow.
+
+- Use `bd ready` to find available work at session start
+- Use `bd create` for multi-session/strategic work; use `TodoWrite` for simple single-session tasks
+- Use `bd close <id>` when completing issues
+- Run `bd sync` before ending any session
+- Priority scale: 0-4 (0=critical, 4=backlog) — do NOT use "high"/"medium"/"low"
+
+### Session Close Protocol
+Before ending work: `git add` → `bd sync` → `git commit` → `bd sync` → `git push`. Work is NOT done until pushed.
+
+## Autonomous Loops — Ralph Loop
+
+Use `/ralph-loop` for iterative, self-correcting development tasks with clear success criteria.
+
+```
+/ralph-loop "<task description>" --max-iterations 20 --completion-promise "DONE"
+```
+
+Output `<promise>DONE</promise>` when the task is complete. Cancel with `/cancel-ralph`.
