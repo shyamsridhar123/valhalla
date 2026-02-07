@@ -20,12 +20,12 @@
 <rect width="1200" height="630" fill="url(#thumb_bg)"/>
 <rect width="1200" height="630" fill="url(#thumb_hex)"/>
 
-<g transform="translate(600, 315)">
-    <g transform="translate(-100, -180) scale(0.4)">
+<g transform="translate(600, 300)">
+    <g transform="translate(-100, -195) scale(0.4)">
         <defs><linearGradient id="tl_b" x1="256" y1="80" x2="256" y2="432" gradientUnits="userSpaceOnUse"><stop stop-color="#38BDF8"/><stop offset="1" stop-color="#0EA5E9"/></linearGradient><linearGradient id="tl_g" x1="256" y1="200" x2="256" y2="312" gradientUnits="userSpaceOnUse"><stop stop-color="#FACC15"/><stop offset="1" stop-color="#EAB308"/></linearGradient><filter id="tl_gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M256 32L449.92 144V368L256 480L62.08 368V144L256 32Z" fill="#0F172A" stroke="#1E293B" stroke-width="8"/><g filter="url(#tl_gl)"><path d="M256 160V352" stroke="url(#tl_b)" stroke-width="16" stroke-linecap="round"/><path d="M256 160L192 112" stroke="url(#tl_b)" stroke-width="12" stroke-linecap="round"/><path d="M256 160L320 112" stroke="url(#tl_b)" stroke-width="12" stroke-linecap="round"/><path d="M256 112V80" stroke="url(#tl_b)" stroke-width="12" stroke-linecap="round"/><path d="M256 352L192 400" stroke="url(#tl_b)" stroke-width="12" stroke-linecap="round"/><path d="M256 352L320 400" stroke="url(#tl_b)" stroke-width="12" stroke-linecap="round"/><path d="M256 400V432" stroke="url(#tl_b)" stroke-width="12" stroke-linecap="round"/><circle cx="192" cy="112" r="12" fill="#38BDF8"/><circle cx="320" cy="112" r="12" fill="#38BDF8"/><circle cx="256" cy="80" r="12" fill="#38BDF8"/><circle cx="192" cy="400" r="12" fill="#38BDF8"/><circle cx="320" cy="400" r="12" fill="#38BDF8"/><circle cx="256" cy="432" r="12" fill="#38BDF8"/></g><path d="M256 224L224 272H288L256 224Z" fill="url(#tl_g)"/><path d="M224 272L256 312L288 272" stroke="url(#tl_g)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M160 256H352" stroke="#64748B" stroke-width="4" stroke-dasharray="8 12" opacity="0.5"/>
     </g>
-    <text x="0" y="60" text-anchor="middle" class="t-title" fill="url(#thumb_text)">VALHALLA</text>
-    <text x="0" y="130" text-anchor="middle" class="t-sub">The Post-IP Networking Stack</text>
-    <text x="0" y="200" text-anchor="middle" class="t-meta">Go • Ed25519 • Decentralized</text>
+    <text x="0" y="78" text-anchor="middle" class="t-title" fill="url(#thumb_text)">VALHALLA</text>
+    <text x="0" y="148" text-anchor="middle" class="t-sub">The Post-IP Networking Stack</text>
+    <text x="0" y="210" text-anchor="middle" class="t-meta">Go • Ed25519 • Decentralized</text>
 </g>
 </svg>
