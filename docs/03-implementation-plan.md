@@ -287,7 +287,7 @@ Can begin in parallel with Phase 4+ once the API shape (Phase 7) is defined. Use
 
 1. **App shell** (`ui/src/App.tsx`)
    - Main layout: sidebar + main panel
-   - Tabs: Network, Stack, Demos, Trust
+   - Design tokens and theming (`theme.ts`)
 
 2. **WebSocket hook** (`ui/src/hooks/useValhalla.ts`)
    - Connect to `ws://localhost:8080/api/events`
@@ -295,35 +295,33 @@ Can begin in parallel with Phase 4+ once the API shape (Phase 7) is defined. Use
    - Auto-reconnect on disconnect
 
 3. **Network topology** (`ui/src/components/NetworkGraph.tsx`)
-   - D3 force-directed layout or React Flow
+   - D3 force-directed layout
    - Nodes as circles with short NodeID labels
    - Edges as connections with animated packet flow
-   - Click node for details panel
 
-4. **Stack visualization** (`ui/src/components/StackView.tsx`)
+4. **Stack visualization** (`ui/src/components/StackView.tsx` + `LayerActivityBar.tsx`)
    - 6-layer vertical stack diagram
    - Highlight active layer during packet processing
+   - Per-layer activity indicator bars
    - Show data transformation at each layer
-   - "OSI equivalent" comparison panel
 
-5. **Packet flow animation** (`ui/src/components/PacketFlow.tsx`)
-   - Step-by-step animation of a message traversing the stack
-   - Show encryption wrapping/unwrapping visually
-   - Play/pause/step controls
+5. **Event log** (`ui/src/components/EventLog.tsx`)
+   - Real-time stream of stack events from all nodes
+   - Filterable by layer and event type
 
-6. **Demo runner** (`ui/src/components/DemoRunner.tsx`)
-   - Dropdown to select scenario
-   - Play/pause controls
-   - Narration text synced with events
+6. **Demo runner** (`ui/src/components/DemoRunner.tsx` + `ScenarioCard.tsx`)
+   - Scenario cards with descriptions
+   - Scenario-specific visualizations (`ScenarioViz.tsx`)
+   - Narration timeline synced with events (`NarrationTimeline.tsx`)
 
-7. **Content explorer** (`ui/src/components/ContentExplorer.tsx`)
-   - List published content with CID, publisher, signature status
-   - Retrieve content by CID
-
-8. **Trust graph** (`ui/src/components/TrustGraph.tsx`)
+7. **Trust graph** (`ui/src/components/TrustGraph.tsx`)
    - Directed graph of attestations
    - Edge labels: claim + confidence
    - Node labels: computed trust scores
+
+8. **State management** (`ui/src/store/useValhallaStore.ts`)
+   - Zustand store for network state, events, scenario progress
+   - Type-safe selectors and actions
 
 ---
 

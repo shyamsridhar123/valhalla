@@ -25,8 +25,8 @@ The PoC is not production-grade. It prioritizes clarity and demonstrability over
 | Symmetric encryption | **golang.org/x/crypto/chacha20poly1305** | AEAD, Go team maintained |
 | WebSocket | **nhooyr.io/websocket** | Clean API, works with net/http |
 | HTTP API | **net/http** (stdlib) | No framework needed |
-| UI | **React + TypeScript** | Component model fits layer visualization |
-| Visualization | **D3.js + React Flow** | Network topology graph, packet flow animation |
+| UI | **React 19 + TypeScript** | Component model fits layer visualization |
+| Visualization | **D3.js** | Force-directed network topology, trust graphs |
 | UI build | **Vite** | Fast dev server, good TypeScript support |
 | UI embedding | **go:embed** | Bake built React app into Go binary |
 
@@ -49,7 +49,8 @@ valhalla/
 ├── docs/                              # Design documents (this folder)
 ├── cmd/
 │   └── valhalla/
-│       └── main.go                    # CLI entry point
+│       ├── main.go                    # CLI entry point
+│       └── ui-dist/                   # Embedded UI build output (go:embed)
 ├── internal/
 │   ├── types/
 │   │   └── types.go                   # NodeID, ContentID, PathAddr, etc.
@@ -59,55 +60,65 @@ valhalla/
 │   │   ├── tcp.go                     # TCP transport
 │   │   └── ws.go                      # WebSocket transport
 │   ├── yggdrasil/                     # Layer 2: Mesh/Routing
-│   │   ├── identity.go               # Keypair generation, NodeID derivation
-│   │   ├── peertable.go              # Kademlia k-bucket peer table
-│   │   ├── dht.go                    # DHT operations (store, lookup)
-│   │   └── router.go                 # Message routing
+│   │   ├── identity.go                # Keypair generation, NodeID derivation
+│   │   ├── peertable.go               # Kademlia k-bucket peer table
+│   │   ├── dht.go                     # DHT operations (store, lookup)
+│   │   ├── router.go                  # Message routing
+│   │   └── bootstrap.go               # Bootstrap and peer discovery
 │   ├── veil/                          # Layer 3: Encrypted Flow
-│   │   ├── handshake.go              # Noise IK handshake via flynn/noise
-│   │   ├── stream.go                 # Multiplexed streams
-│   │   ├── connection.go             # Veil connection manager
-│   │   └── crypto.go                 # ChaCha20-Poly1305, key derivation
+│   │   ├── handshake.go               # Noise XX handshake via flynn/noise
+│   │   ├── crypto.go                  # ChaCha20-Poly1305, key derivation
+│   │   ├── stream.go                  # Stream multiplexing
+│   │   └── connection.go              # Connection manager, pooling
 │   ├── saga/                          # Layer 4: Intent/Content
-│   │   ├── content.go                # ContentID, ContentEnvelope
-│   │   ├── intent.go                 # WANT, FIND, PUBLISH, SUBSCRIBE
-│   │   ├── service.go                # Service registry
-│   │   └── cache.go                  # Local content cache
+│   │   ├── content.go                 # ContentID, ContentEnvelope
+│   │   ├── intent.go                  # WANT, FIND, PUBLISH, SUBSCRIBE
+│   │   ├── service.go                 # Service registry
+│   │   └── cache.go                   # LRU content cache
 │   ├── rune/                          # Layer 5: Trust
-│   │   ├── attestation.go            # Attestation creation/verification
-│   │   ├── capability.go             # Capability tokens
-│   │   └── reputation.go             # Reputation scoring
+│   │   ├── attestation.go             # Attestation creation/verification
+│   │   ├── capability.go              # Capability tokens
+│   │   └── reputation.go              # Reputation scoring
 │   ├── realm/                         # Layer 6: Application
-│   │   ├── rpc.go                    # P2P RPC framework
-│   │   ├── pubsub.go                 # Pub/sub messaging
-│   │   └── crdt.go                   # CRDT state sync (basic LWW register)
+│   │   ├── rpc.go                     # P2P RPC framework
+│   │   ├── pubsub.go                  # Pub/sub messaging
+│   │   └── crdt.go                    # CRDT state sync (LWW register)
 │   ├── node/
-│   │   └── node.go                   # ValhallaNode: composes all layers
+│   │   └── node.go                    # ValhallaNode: composes all layers
 │   ├── api/
-│   │   ├── server.go                 # HTTP/WS API for UI
-│   │   └── events.go                 # WebSocket event stream
+│   │   ├── server.go                  # HTTP/WS API for UI
+│   │   └── events.go                  # WebSocket event stream
 │   └── demo/
-│       └── scenarios.go              # Pre-built demo scenarios
-├── ui/                                # React app (embedded in binary)
+│       ├── network.go                 # Multi-node orchestrator
+│       └── scenarios.go               # Pre-built demo scenarios
+├── ui/                                # React 19 app (embedded in binary)
 │   ├── src/
-│   │   ├── App.tsx
+│   │   ├── App.tsx                    # Main layout with sidebar + panels
+│   │   ├── theme.ts                   # Design tokens and color palette
 │   │   ├── components/
-│   │   │   ├── NetworkGraph.tsx       # D3 topology visualization
-│   │   │   ├── StackView.tsx          # Layer-by-layer packet view
-│   │   │   ├── NodePanel.tsx          # Individual node details
-│   │   │   ├── PacketFlow.tsx         # Animated packet traversal
-│   │   │   ├── DemoRunner.tsx         # Run demo scenarios
-│   │   │   ├── ContentExplorer.tsx    # Browse content-addressed data
-│   │   │   └── TrustGraph.tsx         # Trust/attestation visualization
+│   │   │   ├── NetworkGraph.tsx        # D3 force-directed topology
+│   │   │   ├── StackView.tsx          # 6-layer stack visualization
+│   │   │   ├── TrustGraph.tsx         # Trust/attestation network
+│   │   │   ├── DemoRunner.tsx         # Scenario runner UI
+│   │   │   ├── ScenarioCard.tsx       # Individual scenario card
+│   │   │   ├── ScenarioViz.tsx        # Scenario-specific visualizations
+│   │   │   ├── NarrationTimeline.tsx  # Guided narration during demos
+│   │   │   ├── LayerActivityBar.tsx   # Per-layer event activity
+│   │   │   ├── EventLog.tsx           # Real-time event stream
+│   │   │   └── scenarioMeta.ts        # Scenario metadata
 │   │   ├── hooks/
 │   │   │   └── useValhalla.ts         # WebSocket connection to daemon
-│   │   └── stores/
-│   │       └── network.ts             # Zustand state management
+│   │   ├── store/
+│   │   │   └── useValhallaStore.ts    # Zustand state management
+│   │   ├── types/
+│   │   │   └── api.ts                 # TypeScript types matching Go API
+│   │   └── utils/
+│   │       └── d3-helpers.ts          # D3 helper utilities
 │   ├── package.json
 │   └── vite.config.ts
 ├── go.mod
 ├── go.sum
-└── Makefile                           # build, dev, demo targets
+└── Makefile                           # build, dev, demo, test targets
 ```
 
 ---
@@ -234,62 +245,61 @@ Messages:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  VALHALLA NETWORK EXPLORER                    [Demos v]  │
-├────────────────┬─────────────────────────────────────────┤
-│                │                                         │
-│  NETWORK       │            STACK VIEW                   │
-│  TOPOLOGY      │                                         │
-│                │  ┌─────────────────────────────┐        │
-│   ┌──┐         │  │  Realm    [rpc: send_msg]   │        │
-│   │A ├──┐      │  ├─────────────────────────────┤        │
-│   └──┘  │      │  │  Rune     [cap: check ✓]   │        │
-│     ┌──┐│      │  ├─────────────────────────────┤        │
-│     │B ├┤      │  │  Saga     [cid: Qm7x...]   │        │
-│     └──┘│      │  ├─────────────────────────────┤        │
-│   ┌──┐  │      │  │  Veil     [encrypted ████]  │        │
-│   │C ├──┘      │  ├─────────────────────────────┤        │
-│   └──┘         │  │  Yggdrasil [route: A→B→C]  │        │
-│                │  ├─────────────────────────────┤        │
-│  6 nodes       │  │  Bifrost   [tcp frame 142B] │        │
-│  8 connections │  └─────────────────────────────┘        │
-│                │                                         │
-├────────────────┼─────────────────────────────────────────┤
-│  EVENT LOG     │  PACKET INSPECTOR                       │
-│                │                                         │
-│  12:00:01 Peer │  Layer: Veil                            │
-│  discovered    │  Type: DATA                             │
-│  12:00:02 Hand │  Stream: #3                             │
-│  shake done    │  Encrypted: Yes (ChaCha20)              │
-│  12:00:03 Msg  │  Payload: 256 bytes                     │
-│  delivered     │  Decrypted preview: {"msg": "Hello...   │
-│                │                                         │
-└────────────────┴─────────────────────────────────────────┘
+│  VALHALLA NETWORK EXPLORER                    [Demos ▾]  │
+├───────────────────────┬──────────────────────────────────┤
+│                       │                                  │
+│  NETWORK TOPOLOGY     │  STACK VIEW                      │
+│                       │                                  │
+│    ┌──┐               │  ┌──────────────────────────┐  │
+│    │A ├──┐            │  │ Realm     [rpc: send_msg] │  │
+│    └──┘  │            │  ├──────────────────────────┤  │
+│      ┌──┐│            │  │ Rune      [cap: check ✓] │  │
+│      │B ├┤            │  ├──────────────────────────┤  │
+│      └──┘│            │  │ Saga      [cid: Qm7x...]│  │
+│    ┌──┐  │            │  ├──────────────────────────┤  │
+│    │C ├──┘            │  │ Veil      [encrypted ███] │  │
+│    └──┘               │  ├──────────────────────────┤  │
+│  6 nodes, 8 edges    │  │ Yggdrasil [route: A→B→C]│  │
+│                       │  ├──────────────────────────┤  │
+│                       │  │ Bifrost   [tcp frame 142B]│  │
+│                       │  └──────────────────────────┘  │
+├───────────────────────┼──────────────────────────────────┤
+│  EVENT LOG             │  SCENARIO RUNNER                 │
+│                       │                                  │
+│  12:00:01 peer_disc   │  [Hello, Valhalla    ] [► Run]   │
+│  12:00:02 handshake   │                                  │
+│  12:00:03 msg_sent    │  Narration:                      │
+│  12:00:03 msg_recv    │  "Two nodes establish a Noise XX  │
+│  12:00:04 trust_att   │   handshake and exchange their    │
+│                       │   first encrypted message..."     │
+└───────────────────────┴──────────────────────────────────┘
 ```
 
 ### Key UI Components
 
-**1. Network Topology Graph**
-- Force-directed graph showing all nodes and connections
-- Nodes colored by role/type
-- Edges show active connections with throughput indicators
-- Click a node to see details
+**1. Network Topology Graph** (`NetworkGraph.tsx`)
+- D3 force-directed graph showing all nodes and connections
+- Nodes colored by role/type, edges show active connections
 - Animated packet flow along edges when messages are sent
 
-**2. Stack View**
-- Vertical stack showing all 6 layers
+**2. Stack View** (`StackView.tsx` + `LayerActivityBar.tsx`)
+- Vertical stack showing all 6 layers with real-time activity indicators
 - Highlights the active layer as a packet traverses
-- Shows the transformation at each layer (plaintext -> signed -> encrypted -> framed)
-- Side-by-side comparison: "How this would look in OSI" vs "How it looks in Valhalla"
+- Shows the transformation at each layer (plaintext → signed → encrypted → framed)
 
-**3. Packet Inspector**
-- Click any event to see the full packet at each layer
-- Shows encryption/decryption in real-time
-- Displays content signatures and verification
+**3. Event Log** (`EventLog.tsx`)
+- Real-time stream of stack events from all nodes
+- Filterable by layer and event type
 
-**4. Demo Runner**
+**4. Demo Runner** (`DemoRunner.tsx` + `ScenarioCard.tsx` + `ScenarioViz.tsx`)
 - Pre-built scenarios with guided walkthroughs
-- Play/pause/step controls
-- Narration explaining what's happening at each layer
+- Scenario-specific visualizations
+- Narration timeline explaining what's happening at each layer (`NarrationTimeline.tsx`)
+
+**5. Trust Graph** (`TrustGraph.tsx`)
+- Directed graph of attestations between nodes
+- Edge labels: claim + confidence
+- Node labels: computed trust scores
 
 ---
 
@@ -302,7 +312,7 @@ Simplest possible demo. Two nodes, one sends a message to the other.
 **Shows:**
 - Identity generation (NodeID from keypair)
 - Peer discovery (nodes find each other)
-- Noise IK handshake (1-RTT encrypted connection)
+- Noise XX handshake (encrypted connection)
 - Message flow through all 6 layers
 - Contrast with TCP/IP: "This same message would require DNS lookup, TCP handshake, TLS handshake, HTTP request..."
 

@@ -130,7 +130,7 @@ Core Stack + Daemon (Go)
 └── net/http                    (stdlib, REST API)
 
 UI (React + TypeScript)
-├── React 18+                   (component framework)
+├── React 19                    (component framework)
 ├── D3.js or @xyflow/react      (network topology visualization)
 ├── Framer Motion               (packet flow animation)
 └── Zustand                     (state management)

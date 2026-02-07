@@ -3,7 +3,7 @@
 ## Tech Stack
 
 - **Backend**: Go (goroutines for 6-layer stack, minimal dependencies)
-- **Frontend**: React 18+ with TypeScript, built with Vite
+- **Frontend**: React 19 with TypeScript, built with Vite
 - **State Management**: Zustand
 - **Visualization**: D3.js or React Flow, Framer Motion
 - **Communication**: REST + WebSocket (Go stdlib + nhooyr.io/websocket)

@@ -5,30 +5,31 @@
 The Valhalla stack replaces OSI layers 2-7 with six new layers designed around cryptographic identity, content addressing, and mandatory security.
 
 ```
- OSI Model                          Valhalla Stack
- ──────────                         ──────────────
- ┌─────────────────┐                ┌─────────────────┐
- │  7. Application  │                │  6. Realm       │  Application services
- ├─────────────────┤                │     (App Mesh)  │  P2P services, CRDT sync
- │  6. Presentation │                ├─────────────────┤
- ├─────────────────┤                │  5. Rune        │  Trust, capabilities,
- │  5. Session      │                │     (Trust)     │  reputation, attestation
- ├─────────────────┤                ├─────────────────┤
- │  4. Transport    │                │  4. Saga        │  Content addressing,
- ├─────────────────┤                │     (Intent)    │  service discovery, schema
- │  3. Network      │                ├─────────────────┤
- ├─────────────────┤                │  3. Veil        │  Encrypted streams,
- │  2. Data Link    │                │     (Flow)      │  multiplexing, multi-path
- ├─────────────────┤                ├─────────────────┤
- │  1. Physical     │                │  2. Yggdrasil   │  Crypto identity, DHT
- │                  │                │     (Mesh)      │  routing, overlay network
- └─────────────────┘                ├─────────────────┤
-                                    │  1. Bifrost     │  Framing & tunneling
-                                    │     (Bridge)    │  over existing networks
-                                    ├─────────────────┤
-                                    │  0. Physical    │  Unchanged: wires,
-                                    │                 │  fiber, radio
-                                    └─────────────────┘
+    OSI Model                                       Valhalla Stack
+   ──────────                                      ──────────────
+
+   ┌────────────────────┐                          ┌────────────────────────────────────────────┐
+   │ 7  Application      │  ─────────────────────► │ 6  Realm (App Mesh)                        │
+   │ 6  Presentation     │                          │    P2P services, CRDT state sync            │
+   ├────────────────────┤                          ├────────────────────────────────────────────┤
+   │ 5  Session          │  ─────────────────────► │ 5  Rune (Trust)                            │
+   │                      │                          │    Capabilities, reputation, attestation    │
+   ├────────────────────┤                          ├────────────────────────────────────────────┤
+   │ 4  Transport        │  ─────────────────────► │ 4  Saga (Intent)                           │
+   │                      │                          │    Content addressing, service discovery    │
+   ├────────────────────┤                          ├────────────────────────────────────────────┤
+   │ 3  Network          │  ─────────────────────► │ 3  Veil (Flow)                             │
+   │                      │                          │    Encrypted streams, multiplexing         │
+   ├────────────────────┤                          ├────────────────────────────────────────────┤
+   │ 2  Data Link        │  ─────────────────────► │ 2  Yggdrasil (Mesh)                        │
+   │                      │                          │    Crypto identity, DHT routing            │
+   ├────────────────────┤                          ├────────────────────────────────────────────┤
+   │ 1  Physical         │                          │ 1  Bifrost (Bridge)                        │
+   └────────────────────┘                          │    Framing & tunneling over existing nets   │
+                                                    ├────────────────────────────────────────────┤
+                                                    │ 0  Physical                                │
+                                                    │    Unchanged: wires, fiber, radio           │
+                                                    └────────────────────────────────────────────┘
 ```
 
 Each layer has a Norse-inspired codename reflecting its role:
@@ -188,22 +189,19 @@ Veil replaces TCP + TLS with a single layer that is always encrypted and support
 
 ### Connection Establishment
 
-Veil uses the **Noise IK** handshake pattern (1-RTT when the initiator knows the responder's key, which is always true since the NodeID implies the key):
+Veil uses the **Noise XX** handshake pattern (1.5-RTT, mutual authentication where neither side knows the other's static key in advance):
 
 ```
-Initiator (I) knows Responder's (R) public key (from NodeID resolution)
+Initiator (I) and Responder (R) exchange keys over 3 messages:
 
-  I -> R:  e, es, s, ss, payload    // Initiator's ephemeral key + encrypted static key + data
-  R -> I:  e, ee, se, payload       // Responder's ephemeral key + encrypted data
+  I -> R:  e                         // Initiator's ephemeral key
+  R -> I:  e, ee, s, es              // Responder's ephemeral + encrypted static key
+  I -> R:  s, se                     // Initiator's encrypted static key
 
-After 1 round trip: mutual authentication + forward-secret encrypted channel
+After 1.5 round trips: mutual authentication + forward-secret encrypted channel
 ```
 
-For **0-RTT** reconnection, peers who have previously connected can use a pre-shared key (PSK) derived from the previous session:
-
-```
-I -> R:  e, es, s, ss, psk, payload   // 0-RTT: first message carries application data
-```
+XX was chosen for the PoC because it does not require the initiator to know the responder's static key beforehand, simplifying bootstrap. A future optimization could use **Noise IK** (1-RTT) when the initiator has cached the responder's key from a previous session.
 
 ### Stream Multiplexing
 

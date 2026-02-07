@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# Valhalla UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The web-based visualization frontend for the Valhalla networking stack. Connects to the Go daemon via WebSocket and renders live network state, stack activity, and demo scenarios.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Library | Version | Purpose |
+|---------|---------|---------|
+| React | 19 | Component framework |
+| TypeScript | 5.9 | Type safety |
+| Vite | 7 | Dev server + bundler |
+| D3.js | 7 | Force-directed network topology graph |
+| Zustand | 5 | Lightweight state management |
+| Framer Motion | 12 | Animation (packet flow, transitions) |
 
-## React Compiler
+## Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── App.tsx                    Main layout and routing
+├── main.tsx                   Entry point
+├── theme.ts                   Color palette and design tokens
+├── components/
+│   ├── NetworkGraph.tsx       D3 force-directed mesh topology
+│   ├── StackView.tsx          6-layer stack visualization
+│   ├── TrustGraph.tsx         Attestation / trust network
+│   ├── DemoRunner.tsx         Scenario selection and playback
+│   ├── ScenarioCard.tsx       Individual scenario display card
+│   ├── ScenarioViz.tsx        Scenario-specific visualizations
+│   ├── NarrationTimeline.tsx  Guided narration during demos
+│   ├── LayerActivityBar.tsx   Per-layer event activity indicator
+│   ├── EventLog.tsx           Real-time event stream viewer
+│   └── scenarioMeta.ts        Scenario metadata and descriptions
+├── hooks/
+│   └── useValhalla.ts         WebSocket connection to Go daemon
+├── store/
+│   └── useValhallaStore.ts    Zustand store for network state
+├── types/
+│   └── api.ts                 TypeScript types matching Go API
+└── utils/
+    └── d3-helpers.ts          D3 utilities for graph rendering
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm install       # Install dependencies
+npm run dev       # Start Vite dev server (HMR on :5173)
+npm run build     # Production build → dist/
+npm run lint      # Run ESLint
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+During development, the UI proxies API requests to the Go backend at `localhost:8080`. Run `make dev` from the project root to start both the Go daemon and the Vite dev server simultaneously.
+
+## Production Build
+
+The production build output (`dist/`) is copied into `cmd/valhalla/ui-dist/` and embedded into the Go binary via `go:embed`. The single binary serves the UI at the root path.
+
+```bash
+# From project root:
+make build        # Builds UI, embeds in Go binary → ./bin/valhalla
 ```
