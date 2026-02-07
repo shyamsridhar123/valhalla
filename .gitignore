@@ -19,6 +19,7 @@ skills/
 # Go
 bin/
 dist/
+cmd/valhalla/ui-dist/
 *.exe
 *.exe~
 *.dll

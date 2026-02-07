@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"embed"
 	"flag"
 	"fmt"
+	"io/fs"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +16,9 @@ import (
 	"github.com/valhalla/valhalla/internal/api"
 	"github.com/valhalla/valhalla/internal/demo"
 )
+
+//go:embed all:ui-dist
+var uiFS embed.FS
 
 func main() {
 	var (
@@ -59,6 +65,14 @@ func runDemo(ctx context.Context, nodeCount, basePort int, apiAddr string) {
 	fmt.Println()
 
 	srv := api.NewServer(net, apiAddr)
+
+	// Serve embedded UI files at root
+	uiSub, err := fs.Sub(uiFS, "ui-dist")
+	if err != nil {
+		log.Printf("embedded UI not available: %v", err)
+	} else {
+		srv.ServeStaticUI(http.FS(uiSub))
+	}
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {

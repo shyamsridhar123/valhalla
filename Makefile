@@ -1,10 +1,13 @@
-.PHONY: build dev test demo clean ui
+.PHONY: build dev test demo clean ui bench
 
 GO := go
 BINARY := bin/valhalla
 UI_DIR := ui
+EMBED_DIR := cmd/valhalla/ui-dist
 
 build: ui-build
+	mkdir -p $(EMBED_DIR)
+	cp -r $(UI_DIR)/dist/* $(EMBED_DIR)/
 	$(GO) build -o $(BINARY) ./cmd/valhalla
 
 dev:
@@ -14,6 +17,9 @@ dev:
 
 test:
 	$(GO) test -race -count=1 ./...
+
+bench:
+	$(GO) test -bench=. -benchmem ./internal/types/ ./internal/bifrost/
 
 demo: build
 	./$(BINARY) --demo
@@ -25,4 +31,4 @@ ui-install:
 	cd $(UI_DIR) && npm install
 
 clean:
-	rm -rf $(BINARY) $(UI_DIR)/dist
+	rm -rf $(BINARY) $(UI_DIR)/dist $(EMBED_DIR)
