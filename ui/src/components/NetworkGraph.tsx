@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import * as d3 from 'd3';
 import { AnimatePresence, m } from 'framer-motion';
 import { useValhallaStore } from '../store/useValhallaStore';
@@ -261,8 +261,6 @@ export function NetworkGraph() {
         const src = d.source as GraphNode;
         const tgt = d.target as GraphNode;
         d3.select(this).attr('stroke-opacity', 0.8).attr('stroke-width', 3);
-        const mx = (src.x! + tgt.x!) / 2;
-        const my = (src.y! + tgt.y!) / 2;
         setHoveredLink({ from: src.id, to: tgt.id, x: event.pageX, y: event.pageY });
       })
       .on('mouseleave', function (_, d) {
