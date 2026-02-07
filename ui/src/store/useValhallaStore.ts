@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import type { NodeInfo, PeerLink, StackEvent, ScenarioInfo, TrustInfo } from '../types/api';
 
+export type ScenarioPhase = 'selecting' | 'playing' | 'complete';
+
 interface ValhallaState {
   // Network state
   nodes: NodeInfo[];
@@ -19,6 +21,12 @@ interface ValhallaState {
   eventLayerFilter: string | null;
   expandedEventIndex: number | null;
 
+  // Scenario Theater state
+  scenarioPhase: ScenarioPhase;
+  scenarioLayerActivity: Record<string, boolean>;
+  guidedTourActive: boolean;
+  guidedTourIndex: number;
+
   // Actions
   setNodes: (nodes: NodeInfo[]) => void;
   setPeers: (peers: PeerLink[]) => void;
@@ -31,6 +39,13 @@ interface ValhallaState {
   setRunningScenario: (name: string | null) => void;
   setEventLayerFilter: (layer: string | null) => void;
   setExpandedEventIndex: (index: number | null) => void;
+
+  // Scenario Theater actions
+  setScenarioPhase: (phase: ScenarioPhase) => void;
+  setScenarioLayerActivity: (activity: Record<string, boolean>) => void;
+  setGuidedTourActive: (active: boolean) => void;
+  setGuidedTourIndex: (index: number) => void;
+  resetScenarioState: () => void;
 }
 
 export const useValhallaStore = create<ValhallaState>((set) => ({
@@ -45,6 +60,12 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   runningScenario: null,
   eventLayerFilter: null,
   expandedEventIndex: null,
+
+  // Scenario Theater defaults
+  scenarioPhase: 'selecting',
+  scenarioLayerActivity: {},
+  guidedTourActive: false,
+  guidedTourIndex: 0,
 
   setNodes: (nodes) => set({ nodes }),
   setPeers: (peers) => set({ peers }),
@@ -62,4 +83,18 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   setRunningScenario: (runningScenario) => set({ runningScenario }),
   setEventLayerFilter: (eventLayerFilter) => set({ eventLayerFilter }),
   setExpandedEventIndex: (expandedEventIndex) => set({ expandedEventIndex }),
+
+  // Scenario Theater actions
+  setScenarioPhase: (scenarioPhase) => set({ scenarioPhase }),
+  setScenarioLayerActivity: (scenarioLayerActivity) => set({ scenarioLayerActivity }),
+  setGuidedTourActive: (guidedTourActive) => set({ guidedTourActive }),
+  setGuidedTourIndex: (guidedTourIndex) => set({ guidedTourIndex }),
+  resetScenarioState: () =>
+    set({
+      scenarioPhase: 'selecting',
+      runningScenario: null,
+      scenarioLayerActivity: {},
+      guidedTourActive: false,
+      guidedTourIndex: 0,
+    }),
 }));
