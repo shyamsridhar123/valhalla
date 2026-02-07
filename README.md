@@ -48,16 +48,17 @@ Valhalla replaces OSI layers 2–7 with six new layers designed around cryptogra
 ```bash
 # Prerequisites: Go 1.24+, Node 18+
 
+cd ui && npm install      # Install frontend dependencies (first time only)
+cd ..
 make build                # Build single binary (Go + embedded React UI)
 ./bin/valhalla --demo     # Start 6-node mesh with web UI on :8080
 ```
 
-The demo launches a 6-node mesh and opens a browser UI at **http://localhost:8080** showing:
+Open **http://localhost:8080** — the UI is embedded in the binary. The demo shows:
 
 - **Network topology** — D3 force-directed graph of live mesh connections
 - **Stack visualization** — Per-node 6-layer activity with real-time event flow
-- **Scenario runner** — Guided demos with narration timeline
-- **Trust graph** — Attestation network with transitive reputation scores
+- **Scenario runner** — Guided demos with narration timeline and interactive sandbox
 
 ## Project Structure
 
@@ -75,7 +76,7 @@ internal/
 ├── node/                    Full-stack node assembly
 └── types/                   Shared types (NodeID, ContentID, PathAddr, frames)
 ui/                          React 19 + TypeScript + Vite + D3.js + Zustand
-├── src/components/          NetworkGraph, StackView, TrustGraph, DemoRunner, ...
+├── src/components/          NetworkGraph, StackView, DemoRunner, ApiDocs, ...
 ├── src/hooks/               useValhalla (WebSocket hook)
 ├── src/store/               Zustand state management
 └── src/utils/               D3 helpers
@@ -97,12 +98,15 @@ ui/                          React 19 + TypeScript + Vite + D3.js + Zustand
 ## Development
 
 ```bash
-make test      # Run all tests with race detector
-make bench     # Benchmarks (framing, types)
-make dev       # Dev mode — Go backend + Vite HMR
-make build     # Production build → ./bin/valhalla
-make clean     # Clean build artifacts
+make ui-install  # Install frontend deps (first time)
+make dev         # Dev mode — Go API on :8080 + Vite HMR on :5173
+make build       # Production build → ./bin/valhalla (UI embedded)
+make test        # Run all tests with race detector
+make bench       # Benchmarks (framing, types)
+make clean       # Clean build artifacts
 ```
+
+In dev mode, open **http://localhost:5173** — Vite proxies API calls to the Go backend on `:8080`.
 
 ## Demo Scenarios
 
