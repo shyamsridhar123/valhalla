@@ -17,9 +17,13 @@ interface ValhallaState {
   // UI state
   activeTab: 'network' | 'stack' | 'demos' | 'trust';
   selectedNode: string | null;
+  hoveredLink: string | null;
   runningScenario: string | null;
   eventLayerFilter: string | null;
   expandedEventIndex: number | null;
+
+  // Stack tab state
+  expandedLayer: string | null;
 
   // Scenario Theater state
   scenarioPhase: ScenarioPhase;
@@ -39,9 +43,11 @@ interface ValhallaState {
   clearEvents: () => void;
   setActiveTab: (tab: ValhallaState['activeTab']) => void;
   setSelectedNode: (nodeId: string | null) => void;
+  setHoveredLink: (linkId: string | null) => void;
   setRunningScenario: (name: string | null) => void;
   setEventLayerFilter: (layer: string | null) => void;
   setExpandedEventIndex: (index: number | null) => void;
+  setExpandedLayer: (layer: string | null) => void;
 
   // Scenario Theater actions
   setScenarioPhase: (phase: ScenarioPhase) => void;
@@ -63,9 +69,11 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   maxEvents: 500,
   activeTab: 'network',
   selectedNode: null,
+  hoveredLink: null,
   runningScenario: null,
   eventLayerFilter: null,
   expandedEventIndex: null,
+  expandedLayer: null,
 
   // Scenario Theater defaults
   scenarioPhase: 'selecting',
@@ -89,9 +97,11 @@ export const useValhallaStore = create<ValhallaState>((set) => ({
   clearEvents: () => set({ events: [] }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setSelectedNode: (selectedNode) => set({ selectedNode }),
+  setHoveredLink: (hoveredLink) => set({ hoveredLink }),
   setRunningScenario: (runningScenario) => set({ runningScenario }),
   setEventLayerFilter: (eventLayerFilter) => set({ eventLayerFilter }),
   setExpandedEventIndex: (expandedEventIndex) => set({ expandedEventIndex }),
+  setExpandedLayer: (expandedLayer) => set({ expandedLayer }),
 
   // Scenario Theater actions
   setScenarioPhase: (scenarioPhase) => set({ scenarioPhase }),
