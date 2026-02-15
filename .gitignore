@@ -20,6 +20,9 @@ skills/
 bin/
 dist/
 cmd/valhalla/ui-dist/
+
+# Compiled binaries
+/valhalla
 *.exe
 *.exe~
 *.dll
