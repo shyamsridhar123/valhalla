@@ -25,7 +25,14 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go-version }}
-    
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: ui/package-lock.json
+
     - name: Cache Go modules
       uses: actions/cache@v4
       with:
@@ -35,13 +42,24 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-    
+
+    - name: Install UI dependencies
+      run: cd ui && npm ci
+
+    - name: Build UI
+      run: cd ui && npm run build
+
+    - name: Copy UI build to embed directory
+      run: |
+        mkdir -p cmd/valhalla/ui-dist
+        cp -r ui/dist/* cmd/valhalla/ui-dist/
+
     - name: Download dependencies
       run: go mod download
-    
+
     - name: Build internal packages
       run: go build ./internal/...
-    
+
     - name: Run tests
       run: go test -race -count=1 ./...
     
