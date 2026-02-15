@@ -11,6 +11,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
   <a href="#tech-stack"><img src="https://img.shields.io/badge/deps-3_external-success?style=flat-square" alt="3 External Deps" /></a>
   <a href="#quick-start"><img src="https://img.shields.io/badge/deploy-single_binary-blueviolet?style=flat-square" alt="Single Binary" /></a>
+  <a href="https://github.com/shyamsridhar123/valhalla/actions/workflows/ci.yml"><img src="https://github.com/shyamsridhar123/valhalla/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
 <p align="center">
@@ -161,6 +162,7 @@ make ui-install  # Install frontend deps (first time)
 make dev         # Dev mode — Go API on :8080 + Vite HMR on :5173
 make build       # Production build → ./bin/valhalla (UI embedded)
 make test        # Run all tests with race detector
+make lint        # Run go vet for static analysis
 make bench       # Benchmarks (framing, types)
 make clean       # Clean build artifacts
 ```

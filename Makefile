@@ -1,4 +1,4 @@
-.PHONY: build dev test demo clean ui bench
+.PHONY: build dev test demo clean ui bench lint
 
 GO := go
 BINARY := bin/valhalla
@@ -20,6 +20,9 @@ test:
 
 bench:
 	$(GO) test -bench=. -benchmem ./internal/types/ ./internal/bifrost/
+
+lint:
+	$(GO) vet ./...
 
 demo: build
 	./$(BINARY) --demo
